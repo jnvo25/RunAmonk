@@ -1,0 +1,22 @@
+{
+  "name": "runamonk",
+  "version": "1.0.0",
+  "description": "2D Game",
+  "main": "server.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jnvo25/RunAmonk.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jnvo25/RunAmonk/issues"
+  },
+  "homepage": "https://github.com/jnvo25/RunAmonk#readme"
+}
