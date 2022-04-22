@@ -7,7 +7,7 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -20,9 +20,11 @@
   },
   "homepage": "https://github.com/jnvo25/RunAmonk#readme",
   "devDependencies": {
+    "@babel/preset-env": "^7.16.11",
     "eslint": "^8.14.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.26.0",
-    "jest": "^27.5.1"
+    "jest": "^27.5.1",
+    "@jest/globals": "^27.5.1"
   }
 }
