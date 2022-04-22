@@ -18,5 +18,10 @@
   "bugs": {
     "url": "https://github.com/jnvo25/RunAmonk/issues"
   },
-  "homepage": "https://github.com/jnvo25/RunAmonk#readme"
+  "homepage": "https://github.com/jnvo25/RunAmonk#readme",
+  "devDependencies": {
+    "eslint": "^8.14.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0"
+  }
 }
