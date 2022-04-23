@@ -15,10 +15,16 @@ export default class MainStage extends Phaser.Scene {
     this.socket = this.registry.get('socket');
     this.setupSockets();
 
+    // Load stages
     this.scene.add('WaitingStage', WaitingStage);
     this.scene.add('GameStage', GameStage);
+
+    // Display WaitingRoom
     this.scene.bringToTop('WaitingStage');
     this.scene.launch('WaitingStage');
+
+    // Setup registry data
+    this.registry.set('cursors', this.input.keyboard.createCursorKeys());
   }
 
   setupSockets() {

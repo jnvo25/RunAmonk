@@ -36,6 +36,7 @@ export default class GameStage extends Phaser.Scene {
     // Get variables ready
     this.registry.set('monkeeGroup', this.add.group());
     this.registry.set('runnerGroup', this.add.group());
+    this.cursors = this.registry.get('cursors');
 
     // Create player
     this.data.set('playerSprite', this.createPlayer(200, 200, 'monkee'));
@@ -43,7 +44,30 @@ export default class GameStage extends Phaser.Scene {
     // console.log(this.registry.get('gameRoomOccupants'));
   }
 
-  // TODO: Get player input
+  update() {
+    this.readPlayerInput();
+  }
+
+  readPlayerInput() {
+    const playerSprite = this.data.get('playerSprite');
+    if (this.cursors.up.isDown) {
+      if (playerSprite.body.onFloor()) {
+        playerSprite.setVelocityY(-400);
+      }
+    }
+    if (this.cursors.left.isDown) {
+      playerSprite.setVelocityX(-160);
+      playerSprite.setFlipX(true);
+      playerSprite.anims.play(`${playerSprite.char}-run`, true);
+    } else if (this.cursors.right.isDown) {
+      playerSprite.setVelocityX(160);
+      playerSprite.setFlipX(false);
+      playerSprite.anims.play(`${playerSprite.char}-run`, true);
+    } else {
+      playerSprite.setVelocityX(0);
+      playerSprite.anims.play(`${playerSprite.char}-idle`, true);
+    }
+  }
 
   createPlayer(positionX, positionY, character) {
     const tempPlayerSprite = this.physics.add.sprite(positionX, positionY, `${character}-idle`);
