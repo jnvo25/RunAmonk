@@ -10,7 +10,7 @@ module.exports = class Game {
   }
 
   addPlayer(socketId) {
-    this.players.get('waiting').set(socketId, new Player());
+    this.players.get('pregame').set(socketId, new Player());
   }
 
   getPlayerStatus(socketId) {
@@ -40,12 +40,12 @@ module.exports = class Game {
 
   updateReadyPlayer(socketId) {
     // Get waiting player object and set isReady property
-    if (!this.players.get('waiting').has(socketId)) throw new Error(`There is no player with socketId, ${socketId}, in the waiting map`);
-    this.players.get('waiting').get(socketId).isReady = true;
+    if (!this.players.get('pregame').has(socketId)) throw new Error(`There is no player with socketId, ${socketId}, in the pregame map`);
+    this.players.get('pregame').get(socketId).isReady = true;
   }
 
-  get isAllReady() {
-    const iterator = this.players.get('waiting').values();
+  get readyToStart() {
+    const iterator = this.players.get('pregame').values();
     let value = iterator.next();
     while (!value.done) {
       if (!value.value.isReady) return false;
