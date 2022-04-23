@@ -47,7 +47,7 @@ describe('Game Class', () => {
     expect(tempGame.players.get('pregame').get('jki9okpi0ijuhyg6trfd').isReady).toBeTruthy();
   });
 
-  test('calculate if all players ready', () => {
+  test('calculate if all players ready to start', () => {
     const tempGame = new Game();
     tempGame.addPlayer('g6yhft5r4dswerdtguji');
     tempGame.addPlayer('jki9okpi0ijuhyg6trfd');
@@ -55,5 +55,16 @@ describe('Game Class', () => {
     expect(tempGame.readyToStart).toBeFalsy();
     tempGame.updateReadyPlayer('g6yhft5r4dswerdtguji');
     expect(tempGame.readyToStart).toBeTruthy();
+  });
+
+  test('start game by moving all players from pregame to game', () => {
+    const tempGame = new Game();
+    tempGame.addPlayer('g6yhft5r4dswerdtguji');
+    tempGame.addPlayer('jki9okpi0ijuhyg6trfd');
+    tempGame.updateReadyPlayer('jki9okpi0ijuhyg6trfd');
+    tempGame.updateReadyPlayer('g6yhft5r4dswerdtguji');
+    tempGame.startGame();
+    expect(tempGame.getPlayerStatus('jki9okpi0ijuhyg6trfd')).toEqual('game');
+    expect(tempGame.getPlayerStatus('g6yhft5r4dswerdtguji')).toEqual('game');
   });
 });
