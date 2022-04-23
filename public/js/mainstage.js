@@ -1,7 +1,10 @@
+// eslint-disable-next-line import/extensions
+import WaitingStage from './waitingstage.js';
+
 // eslint-disable-next-line no-undef
 export default class MainStage extends Phaser.Scene {
   constructor() {
-    super('WaitingStage');
+    super('MainStage');
   }
 
   create() {
@@ -9,6 +12,9 @@ export default class MainStage extends Phaser.Scene {
     // eslint-disable-next-line no-undef
     this.registry.set('socket', io());
     this.socket = this.registry.get('socket');
-    this.setupSockets();
+
+    this.scene.add('WaitingStage', WaitingStage);
+    this.scene.bringToTop('WaitingStage');
+    this.scene.launch('WaitingStage');
   }
 }

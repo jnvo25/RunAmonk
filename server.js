@@ -1,3 +1,4 @@
+// Setup Express server
 const express = require('express');
 const path = require('path');
 
@@ -15,8 +16,21 @@ server.listen(process.env.PORT || 8080, () => { // Uses port set by heroku
   console.log(`Listening on ${server.address().port}`);
 });
 
-const Game = require('./public/js/game');
+// Handle game logic
+const GameObject = require('./public/js/game');
 
+const Game = new GameObject();
+
+// Handle connections
 io.on('connection', (socket) => {
-  console.log(socket.id);
+  Game.addPlayer(socket.id);
+
+  socket.on('disconnect', () => {
+    Game.deletePlayer(socket.id);
+  });
+
+  socket.on('client_playerReady', () => {
+    Game.updateReadyPlayer(socket.id);
+    io.emit('server_waitingRoomUpdate', Array.from(Game.players.get('waiting').values()));
+  });
 });
