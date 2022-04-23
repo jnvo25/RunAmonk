@@ -13,6 +13,18 @@ module.exports = class Game {
     this.players.get('pregame').set(socketId, new Player());
   }
 
+  startGame() {
+    if (!this.readyToStart) throw new Error('Game is not ready to start');
+
+    // Move all players from pregame to game state
+    const iterator = this.players.get('pregame').keys();
+    let value = iterator.next();
+    while (!value.done) {
+      this.movePlayer(value.value, 'game');
+      value = iterator.next();
+    }
+  }
+
   getPlayerStatus(socketId) {
     // Get all state maps and iterate
     const iterator = this.players.entries();
