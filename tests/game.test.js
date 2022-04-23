@@ -1,5 +1,5 @@
 import { describe, expect, test } from '@jest/globals';
-import Game from '../src/game';
+import Game from '../public/js/game';
 
 let tempGame;
 

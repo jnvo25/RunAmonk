@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Monkee</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+    <style>
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+<script type="module">
+    import WaitingStage from '/js/waitingstage.js';
+
+    var config = {
+        type: Phaser.AUTO,
+        width: 800,
+        height: 600,
+        physics: {
+            default: 'arcade',
+            arcade: {
+                gravity: { y: 1000 },
+                debug: false
+            }
+        },
+        scene: [ WaitingStage ]
+    };
+
+    var game = new Phaser.Game(config);
+
+</script>
+</body>
+</html>
