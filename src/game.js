@@ -2,10 +2,11 @@ import Player from './player';
 
 export default class Game {
   constructor() {
-    this.players = new Map();
-    this.players.set('waiting', new Map());
-    this.players.set('pregame', new Map());
-    this.players.set('game', new Map());
+    this.players = new Map([
+      ['waiting', new Map()],
+      ['pregame', new Map()],
+      ['game', new Map()],
+    ]);
   }
 
   addPlayer(socketId) {
