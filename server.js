@@ -31,10 +31,9 @@ io.on('connection', (socket) => {
 
   socket.on('client_playerReady', () => {
     Game.updateReadyPlayer(socket.id);
-    if (Game.isAllReady) {
-      // Start game
-      // TODO: Start game object
-      // TODO: Emit to user that game has begun
+    if (Game.readyToStart) {
+      Game.startGame();
+      io.emit('server_gameStarted', Array.from(Game.players.get('game').values()));
     } else {
       io.emit('server_waitingRoomUpdate', Array.from(Game.players.get('waiting').values()));
     }
