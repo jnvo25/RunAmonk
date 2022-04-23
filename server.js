@@ -15,6 +15,8 @@ server.listen(process.env.PORT || 8080, () => { // Uses port set by heroku
   console.log(`Listening on ${server.address().port}`);
 });
 
+const Game = require('./public/js/game');
+
 io.on('connection', (socket) => {
   console.log(socket.id);
 });

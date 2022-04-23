@@ -1,4 +1,4 @@
-export default class Player {
+module.exports = class Player {
   constructor() {
     this.character = undefined;
     this.isReady = false;
@@ -10,4 +10,4 @@ export default class Player {
     this.isTagged = false;
     this.character = undefined;
   }
-}
+};

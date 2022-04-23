@@ -1,6 +1,6 @@
-import Player from './player';
+const Player = require('./player');
 
-export default class Game {
+module.exports = class Game {
   constructor() {
     this.players = new Map([
       ['waiting', new Map()],
@@ -65,4 +65,4 @@ export default class Game {
   get gamePlayers() {
     return this.players.get('game').keys();
   }
-}
+};
