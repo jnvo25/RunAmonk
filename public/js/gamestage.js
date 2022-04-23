@@ -38,21 +38,20 @@ export default class GameStage extends Phaser.Scene {
     this.registry.set('runnerGroup', this.add.group());
 
     // Create player
-    const tempPlayerSprite = this.createPlayer(200, 200, 'monkee', 'asdfasdf');
-    
+    this.data.set('playerSprite', this.createPlayer(200, 200, 'monkee'));
+
     // console.log(this.registry.get('gameRoomOccupants'));
   }
 
   // TODO: Get player input
 
-  createPlayer(positionX, positionY, character, id) {
+  createPlayer(positionX, positionY, character) {
     const tempPlayerSprite = this.physics.add.sprite(positionX, positionY, `${character}-idle`);
 
     // Character data
     tempPlayerSprite.anims.play(`${character}-idle`, true);
-    tempPlayerSprite.id = id;
+    tempPlayerSprite.id = this.registry.get('socketId');
     tempPlayerSprite.character = character;
-    tempPlayerSprite.isTagged = false;
     if (character === 'monkee') {
       this.registry.get('monkeeGroup').add(tempPlayerSprite);
     } else {

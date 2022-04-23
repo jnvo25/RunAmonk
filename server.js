@@ -23,6 +23,8 @@ const Game = new GameObject();
 
 // Handle connections
 io.on('connection', (socket) => {
+  socket.emit('welcome', socket.id);
+
   Game.addPlayer(socket.id);
 
   socket.on('disconnect', () => {
