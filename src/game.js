@@ -38,6 +38,22 @@ export default class Game {
     this.players.get(playerState).delete(socketId);
   }
 
+  updateReadyPlayer(socketId) {
+    // Get waiting player object and set isReady property
+    if (!this.players.get('waiting').has(socketId)) throw new Error(`There is no player with socketId, ${socketId}, in the waiting map`);
+    this.players.get('waiting').get(socketId).isReady = true;
+  }
+
+  get isAllReady() {
+    const iterator = this.players.get('waiting').values();
+    let value = iterator.next();
+    while (!value.done) {
+      if (!value.value.isReady) return false;
+      value = iterator.next();
+    }
+    return true;
+  }
+
   get waitingPlayers() {
     return this.players.get('waiting').keys();
   }

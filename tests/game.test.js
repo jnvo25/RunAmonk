@@ -34,4 +34,21 @@ describe('Game Class', () => {
     expect(tempGame.getPlayerStatus('juh7ygt5de0fkcru7hbg')).toBe('pregame');
     expect(Array.from(tempGame.waitingPlayers)).toHaveLength(0);
   });
+
+  test('set player as ready', () => {
+    tempGame.addPlayer('jki9okpi0ijuhyg6trfd');
+    tempGame.updateReadyPlayer('jki9okpi0ijuhyg6trfd');
+    expect(tempGame.players.get('waiting').get('jki9okpi0ijuhyg6trfd').isReady).toBeTruthy();
+  });
+
+  test('calculate if all players ready', () => {
+    tempGame.addPlayer('g6yhft5r4dswerdtguji');
+    expect(tempGame.isAllReady).toBeFalsy();
+    tempGame.updateReadyPlayer('g6yhft5r4dswerdtguji');
+    expect(tempGame.isAllReady).toBeTruthy();
+  });
+
+  test('list all players in waiting state who are ready', () => {
+
+  });
 });
