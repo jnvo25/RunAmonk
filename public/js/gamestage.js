@@ -14,7 +14,7 @@ export default class GameStage extends Phaser.Scene {
 
   create() {
     // Create stage
-    const backgroundImage = this.add.image(0,0, 'background').setOrigin(0,0);
+    const backgroundImage = this.add.image(0, 0, 'background').setOrigin(0, 0);
     backgroundImage.setScale(2, 0.8);
     const map = this.make.tilemap({ key: 'map' });
     const tileset = map.addTilesetImage('terrain_tilesheet', 'tiles');
@@ -25,6 +25,7 @@ export default class GameStage extends Phaser.Scene {
     this.socket = this.registry.get('socket');
     this.setupSockets();
 
+    // TODO: Draw character
     console.log(this.registry.get('gameRoomOccupants'));
   }
 
