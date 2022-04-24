@@ -16,12 +16,8 @@ export default class MainStage extends Phaser.Scene {
     this.socket = this.registry.get('socket');
     this.setupSockets();
 
-    // Load stages
-    this.scene.add('WaitingStage', WaitingStage);
-    this.scene.add('GameStage', GameStage);
-    this.scene.add('PostgameStage', PostgameStage);
-
     // Display WaitingRoom
+    this.scene.add('WaitingStage', WaitingStage);
     this.scene.bringToTop('WaitingStage');
     this.scene.launch('WaitingStage');
 
@@ -38,15 +34,25 @@ export default class MainStage extends Phaser.Scene {
 
     this.socket.on('server_playAgainGranted', () => {
       this.scene.remove('PostgameStage');
+      this.scene.add('WaitingStage', WaitingStage);
       this.scene.bringToTop('WaitingStage');
       this.scene.launch('WaitingStage');
     });
 
-    this.socket.on('server_gameStarted', (gameRoomOccupants) => {
+    this.socket.on('server_gameStarted', (startData) => {
       this.scene.remove('WaitingStage');
-      this.registry.set('gameRoomOccupants', gameRoomOccupants);
+      this.registry.set('gameRoomOccupants', startData.players);
+      this.registry.set('startTime', startData.startTime);
+      this.scene.add('GameStage', GameStage);
       this.scene.bringToTop('GameStage');
       this.scene.launch('GameStage');
+    });
+
+    this.socket.on('server_gameOver', () => {
+      this.scene.add('PostgameStage', PostgameStage);
+      this.scene.remove('GameStage');
+      this.scene.bringToTop('PostgameStage');
+      this.scene.launch('PostgameStage');
     });
   }
 }
