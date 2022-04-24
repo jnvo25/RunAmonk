@@ -10,6 +10,8 @@ export default class PostgameStage extends Phaser.Scene {
   preload() {
     this.screenCenterX = this.registry.get('screenCenterX');
     this.screenCenterY = this.registry.get('screenCenterY');
+
+    this.socket = this.registry.get('socket');
   }
 
   create() {
@@ -17,6 +19,7 @@ export default class PostgameStage extends Phaser.Scene {
 
     this.playAgainButton = new Button(this.screenCenterX, this.screenCenterY, 'Play Again', this, () => {
       // TODO: Request server to play again
+      this.socket.emit('client_playAgain');
     });
     this.exitButton = new Button(this.screenCenterX, this.screenCenterY + 50, 'Exit', this, () => {
       // TODO: Tell server to disconnect

@@ -40,4 +40,8 @@ io.on('connection', (socket) => {
       io.emit('server_waitingRoomUpdate', Array.from(Game.players.get('waiting').values()));
     }
   });
+
+  socket.on('client_playAgain', () => {
+    socket.emit('server_playAgainGranted');
+  });
 });

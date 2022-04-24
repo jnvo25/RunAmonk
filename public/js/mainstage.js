@@ -36,6 +36,12 @@ export default class MainStage extends Phaser.Scene {
       this.registry.set('socketId', socketId);
     });
 
+    this.socket.on('server_playAgainGranted', () => {
+      this.scene.remove('PostgameStage');
+      this.scene.bringToTop('WaitingStage');
+      this.scene.launch('WaitingStage');
+    });
+
     this.socket.on('server_gameStarted', (gameRoomOccupants) => {
       this.scene.remove('WaitingStage');
       this.registry.set('gameRoomOccupants', gameRoomOccupants);
