@@ -1,6 +1,7 @@
 /* eslint-disable import/extensions */
 import WaitingStage from './waitingstage.js';
 import GameStage from './gamestage.js';
+import PostgameStage from './postgamestage.js';
 
 // eslint-disable-next-line no-undef
 export default class MainStage extends Phaser.Scene {
@@ -18,6 +19,7 @@ export default class MainStage extends Phaser.Scene {
     // Load stages
     this.scene.add('WaitingStage', WaitingStage);
     this.scene.add('GameStage', GameStage);
+    this.scene.add('PostgameStage', PostgameStage);
 
     // Display WaitingRoom
     this.scene.bringToTop('WaitingStage');
@@ -25,6 +27,8 @@ export default class MainStage extends Phaser.Scene {
 
     // Setup registry data
     this.registry.set('cursors', this.input.keyboard.createCursorKeys());
+    this.registry.set('screenCenterX', this.cameras.main.worldView.x + this.cameras.main.width / 2);
+    this.registry.set('screenCenterY', this.cameras.main.worldView.y + this.cameras.main.height / 2);
   }
 
   setupSockets() {
