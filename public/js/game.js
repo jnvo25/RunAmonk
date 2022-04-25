@@ -10,6 +10,8 @@ module.exports = class Game {
   }
 
   addPlayer(socketId) {
+    Game.verifyValidSocketId(socketId);
+
     this.players.get('pregame').set(socketId, new Player());
   }
 
@@ -26,6 +28,8 @@ module.exports = class Game {
   }
 
   getPlayerStatus(socketId) {
+    Game.verifyValidSocketId(socketId);
+
     // Get all state maps and iterate
     const iterator = this.players.entries();
     let value = iterator.next();
@@ -37,10 +41,14 @@ module.exports = class Game {
   }
 
   deletePlayer(socketId) {
+    Game.verifyValidSocketId(socketId);
     this.players.get(this.getPlayerStatus(socketId)).delete(socketId);
   }
 
   movePlayer(socketId, status) {
+    Game.verifyValidSocketId(socketId);
+    Game.verifyValidStatus(status);
+
     // Get player information
     const playerState = this.getPlayerStatus(socketId);
     const tempPlayer = this.players.get(playerState).get(socketId);
@@ -51,6 +59,8 @@ module.exports = class Game {
   }
 
   updateReadyPlayer(socketId) {
+    Game.verifyValidSocketId(socketId);
+
     // Get waiting player object and set isReady property
     if (!this.players.get('pregame').has(socketId)) throw new Error(`There is no player with socketId, ${socketId}, in the pregame map`);
     this.players.get('pregame').get(socketId).isReady = true;
@@ -76,5 +86,13 @@ module.exports = class Game {
 
   get gamePlayers() {
     return this.players.get('game').keys();
+  }
+
+  static verifyValidSocketId(socketId) {
+    if (socketId.length !== 20) throw new Error(`Invalid socket id: ${socketId}`);
+  }
+
+  static verifyValidStatus(status) {
+    if (!Array.from(this.players.keys()).has(status)) throw new Error(`Invalid status: ${status}`);
   }
 };
