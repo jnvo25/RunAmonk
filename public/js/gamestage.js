@@ -78,11 +78,7 @@ export default class GameStage extends Phaser.Scene {
     tempPlayerSprite.anims.play(`${character}-idle`, true);
     tempPlayerSprite.id = this.registry.get('socketId');
     tempPlayerSprite.character = character;
-    if (character === 'monkee') {
-      this.registry.get('monkeeGroup').add(tempPlayerSprite);
-    } else {
-      this.registry.get('runnerGroup').add(tempPlayerSprite);
-    }
+    this.registry.get((character === 'monkee') ? 'monkeeGroup' : 'runnerGroup').add(tempPlayerSprite);
 
     // Character appearance
     tempPlayerSprite.setSize(14, 27);
