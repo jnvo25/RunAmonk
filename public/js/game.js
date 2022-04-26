@@ -17,7 +17,7 @@ module.exports = class Game {
 
   addPlayer(socketId) {
     Game.verifyValidSocketId(socketId);
-
+    // TODO: Add player to waiting if game is not over
     this.players.get('pregame').set(socketId, new Player());
   }
 
@@ -88,6 +88,7 @@ module.exports = class Game {
       if (!value.value.isReady) return false;
       value = iterator.next();
     }
+    // TODO: Make sure there are more than 1 ready player
     return true;
   }
 
