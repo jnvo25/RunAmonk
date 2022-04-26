@@ -43,6 +43,7 @@ export default class MainStage extends Phaser.Scene {
       this.scene.remove('WaitingStage');
       this.registry.set('gameRoomOccupants', startData.players);
       this.registry.set('startTime', startData.startTime);
+      this.registry.set('gameDuration', startData.gameDuration);
       this.scene.add('GameStage', GameStage);
       this.scene.bringToTop('GameStage');
       this.scene.launch('GameStage');

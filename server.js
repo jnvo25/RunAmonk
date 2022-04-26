@@ -41,6 +41,7 @@ io.on('connection', (socket) => {
       io.emit('server_gameStarted', {
         players: Game.players.get('game'),
         startTime: Game.startTime,
+        gameDuration: Game.gameDuration,
       });
     } else {
       io.emit('server_waitingRoomUpdate', Array.from(Game.players.get('waiting').values()));
