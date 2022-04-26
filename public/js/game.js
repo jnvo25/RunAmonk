@@ -82,6 +82,7 @@ module.exports = class Game {
   }
 
   startPregame() {
+    // TODO: Write tests
     // TODO: Move all players from waiting and game room to pregame room
     // TODO: Set game timer undefined
     // TODO: Set player's tagged status to undefined
