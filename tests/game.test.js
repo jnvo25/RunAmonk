@@ -76,7 +76,7 @@ describe('Game Class', () => {
     expect(tempGame.getPlayerStatus('g6yhft5r4dswerdtguji')).toEqual('game');
   });
 
-  test('start game by moving all players from pregame to game', () => {
+  test('start game, wait 100 seconds, check if game ended', () => {
     const tempGame = new Game();
     tempGame.addPlayer('g6yhft5r4dswerdtguji');
     tempGame.addPlayer('jki9okpi0ijuhyg6trfd');
