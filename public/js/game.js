@@ -81,6 +81,12 @@ module.exports = class Game {
     this.players.get('pregame').get(socketId).isReady = true;
   }
 
+  startPregame() {
+    // TODO: Move all players from waiting and game room to pregame room
+    // TODO: Set game timer undefined
+    // TODO: Set player's tagged status to undefined
+  }
+
   get readyToStart() {
     const iterator = this.players.get('pregame').values();
     let value = iterator.next();
