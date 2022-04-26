@@ -45,7 +45,7 @@ export default class GameStage extends Phaser.Scene {
     this.data.set('playerSprite', this.createPlayer(200, 200, 'monkee'));
 
     // Create timer
-    this.timer = this.add.text(200, 100, (this.registry.get('gameDuration') - Date.now() - this.registry.get('startTime')), { backgroundColor: '#ffo', fontSize: '40px' }).setOrigin(0.5);
+    this.timer = this.add.text(738, 35, (this.registry.get('gameDuration') - Date.now() - this.registry.get('startTime')), { backgroundColor: '#ffo', fontSize: '40px' }).setOrigin(0.5);
     // console.log(this.registry.get('gameRoomOccupants'));
   }
 
