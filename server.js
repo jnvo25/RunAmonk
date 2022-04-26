@@ -34,14 +34,13 @@ io.on('connection', (socket) => {
   socket.on('client_playerReady', () => {
     Game.updateReadyPlayer(socket.id);
     if (Game.readyToStart) {
-      const GAME_DURATION = 1; // Seconds
       Game.startGame();
       setTimeout(() => {
         io.emit('server_gameOver');
-      }, GAME_DURATION * 1000);
+      }, Game.gameDuration);
       io.emit('server_gameStarted', {
-        players: Array.from(Game.players.get('game').values()),
-        startTime: Date.now(),
+        players: Game.players.get('game'),
+        startTime: Game.startTime,
       });
     } else {
       io.emit('server_waitingRoomUpdate', Array.from(Game.players.get('waiting').values()));
