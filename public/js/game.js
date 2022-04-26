@@ -73,6 +73,7 @@ module.exports = class Game {
       if (!value.value.isReady) return false;
       value = iterator.next();
     }
+    // TODO: Make sure there are more than 1 ready player
     return true;
   }
 
