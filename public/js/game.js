@@ -11,7 +11,7 @@ module.exports = class Game {
 
   addPlayer(socketId) {
     Game.verifyValidSocketId(socketId);
-
+    // TODO: Add player to waiting if game is not over
     this.players.get('pregame').set(socketId, new Player());
   }
 
