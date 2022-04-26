@@ -13,6 +13,7 @@ app.get('/', (req, res) => {
 });
 
 server.listen(process.env.PORT || 8080, () => { // Uses port set by heroku
+  // eslint-disable-next-line no-console
   console.log(`Listening on ${server.address().port}`);
 });
 
