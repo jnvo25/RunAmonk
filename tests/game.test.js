@@ -1,5 +1,14 @@
-import { describe, expect, test } from '@jest/globals';
+import {
+  describe, expect, jest, test,
+} from '@jest/globals';
+
 import Game from '../public/js/game';
+
+function getFutureDate(seconds) {
+  const t = new Date();
+  t.setSeconds(t.getSeconds() + seconds);
+  return t;
+}
 
 describe('Game Class', () => {
   test('create instance', () => {
@@ -33,7 +42,6 @@ describe('Game Class', () => {
     const tempGame = new Game();
     tempGame.addPlayer('juh7ygt5de0fkcru7hbg');
     expect(tempGame.getPlayerStatus('juh7ygt5de0fkcru7hbg')).toBe('pregame');
-
     tempGame.movePlayer('juh7ygt5de0fkcru7hbg', 'game');
 
     expect(tempGame.getPlayerStatus('juh7ygt5de0fkcru7hbg')).toBe('game');
@@ -66,5 +74,17 @@ describe('Game Class', () => {
     tempGame.startGame();
     expect(tempGame.getPlayerStatus('jki9okpi0ijuhyg6trfd')).toEqual('game');
     expect(tempGame.getPlayerStatus('g6yhft5r4dswerdtguji')).toEqual('game');
+  });
+
+  test('start game by moving all players from pregame to game', () => {
+    const tempGame = new Game();
+    tempGame.addPlayer('g6yhft5r4dswerdtguji');
+    tempGame.addPlayer('jki9okpi0ijuhyg6trfd');
+    tempGame.updateReadyPlayer('jki9okpi0ijuhyg6trfd');
+    tempGame.updateReadyPlayer('g6yhft5r4dswerdtguji');
+    tempGame.startGame();
+    expect(tempGame.isGameOver()).toBeFalsy();
+    jest.useFakeTimers().setSystemTime(getFutureDate(100));
+    expect(tempGame.isGameOver()).toBeTruthy();
   });
 });

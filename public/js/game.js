@@ -1,12 +1,18 @@
 const Player = require('./player');
 
+const GAME_DURATION = 100 * 1000; // Seconds to MS
+
+const GAME_STATUS = [
+  'waiting',
+  'pregame',
+  'game',
+];
+
 module.exports = class Game {
   constructor() {
-    this.players = new Map([
-      ['waiting', new Map()],
-      ['pregame', new Map()],
-      ['game', new Map()],
-    ]);
+    this.players = new Map(GAME_STATUS.map((status) => [status, new Map()]));
+    this.startTime = undefined;
+    this.gameDuration = GAME_DURATION;
   }
 
   addPlayer(socketId) {
@@ -17,6 +23,7 @@ module.exports = class Game {
 
   startGame() {
     if (!this.readyToStart) throw new Error('Game is not ready to start');
+    if (this.startTime !== undefined) throw new Error('Error starting game, start time exists');
 
     // Move all players from pregame to game state
     const iterator = this.players.get('pregame').keys();
@@ -25,6 +32,14 @@ module.exports = class Game {
       this.movePlayer(value.value, 'game');
       value = iterator.next();
     }
+
+    // Start timer
+    this.startTime = Date.now();
+  }
+
+  isGameOver() {
+    if (this.startTime === undefined) throw new Error('Game has not started yet');
+    return (Date.now() - this.startTime > this.gameDuration);
   }
 
   getPlayerStatus(socketId) {
@@ -93,6 +108,6 @@ module.exports = class Game {
   }
 
   static verifyValidStatus(status) {
-    if (!Array.from(this.players.keys()).has(status)) throw new Error(`Invalid status: ${status}`);
+    if (GAME_STATUS.indexOf(status) === -1) throw new Error(`Invalid status: ${status}`);
   }
 };
