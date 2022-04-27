@@ -39,7 +39,7 @@ module.exports = class Game {
 
   isGameOver() {
     if (this.startTime === undefined) throw new Error('Game has not started yet');
-    return (Date.now() - this.startTime > this.gameDuration);
+    return (Date.now() - this.startTime >= this.gameDuration);
   }
 
   getPlayerStatus(socketId) {
@@ -82,13 +82,20 @@ module.exports = class Game {
   }
 
   startPregame() {
-    // TODO: Write tests
-    // TODO: Move all players from waiting and game room to pregame room
-    // TODO: Set game timer undefined
-    // TODO: Set player's tagged status to undefined
+    // Move all players from waiting and game room to pregame room
+    const waitingPlayerIds = Array.from(this.players.get('waiting').keys());
+    const gamePlayerIds = Array.from(this.players.get('game').keys());
+    waitingPlayerIds.concat(gamePlayerIds).forEach((id) => {
+      this.movePlayer(id, 'pregame');
+      this.players.get('pregame').get(id).isReady = false;
+    });
+
+    this.startTime = undefined;
   }
 
   get readyToStart() {
+    if (this.startTime !== undefined) return false;
+
     const iterator = this.players.get('pregame').values();
     let value = iterator.next();
     while (!value.done) {

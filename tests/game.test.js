@@ -87,4 +87,25 @@ describe('Game Class', () => {
     jest.useFakeTimers().setSystemTime(getFutureDate(100));
     expect(tempGame.isGameOver()).toBeTruthy();
   });
+
+  test('startPregame resets game variables', () => {
+    const tempGame = new Game();
+    tempGame.addPlayer('g6yhft5r4dswerdtguji');
+    tempGame.addPlayer('jki9okpi0ijuhyg6trfd');
+    tempGame.updateReadyPlayer('jki9okpi0ijuhyg6trfd');
+    tempGame.updateReadyPlayer('g6yhft5r4dswerdtguji');
+    tempGame.startGame();
+    jest.useFakeTimers().setSystemTime(getFutureDate(100));
+    tempGame.startPregame();
+
+    // Both players should be in pregame stage and not ready
+    expect(tempGame.getPlayerStatus('jki9okpi0ijuhyg6trfd')).toBe('pregame');
+    expect(tempGame.getPlayerStatus('g6yhft5r4dswerdtguji')).toBe('pregame');
+    const iterator = tempGame.players.get('pregame').values();
+    let value = iterator.next();
+    while (!value.done) {
+      expect(value.value.isReady).toBeFalsy();
+      value = iterator.next();
+    }
+  });
 });
