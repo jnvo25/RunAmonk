@@ -38,6 +38,7 @@ io.on('connection', (socket) => {
       Game.startGame();
       setTimeout(() => {
         io.emit('server_gameOver');
+        Game.startPregame();
       }, Game.gameDuration);
       io.emit('server_gameStarted', {
         players: Game.players.get('game'),
