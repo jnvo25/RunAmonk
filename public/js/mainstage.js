@@ -1,5 +1,5 @@
 /* eslint-disable import/extensions */
-import WaitingStage from './waitingstage.js';
+import PregameStage from './PregameStage.js';
 import GameStage from './gamestage.js';
 import PostgameStage from './postgamestage.js';
 
@@ -16,11 +16,6 @@ export default class MainStage extends Phaser.Scene {
     this.socket = this.registry.get('socket');
     this.setupSockets();
 
-    // Display WaitingRoom
-    this.scene.add('WaitingStage', WaitingStage);
-    this.scene.bringToTop('WaitingStage');
-    this.scene.launch('WaitingStage');
-
     // Setup registry data
     this.registry.set('cursors', this.input.keyboard.createCursorKeys());
     this.registry.set('screenCenterX', this.cameras.main.worldView.x + this.cameras.main.width / 2);
@@ -28,19 +23,30 @@ export default class MainStage extends Phaser.Scene {
   }
 
   setupSockets() {
-    this.socket.on('welcome', (socketId) => {
-      this.registry.set('socketId', socketId);
+    this.socket.on('welcome', (welcomeInfo) => {
+      this.registry.set('socketId', welcomeInfo.socketId);
+      if (welcomeInfo.playerRoom === 'waiting') {
+        // Display WaitingRoom
+        this.scene.add('PregameStage', PregameStage);
+        this.scene.bringToTop('PregameStage');
+        this.scene.launch('PregameStage');
+      } else {
+        // Display WaitingRoom
+        this.scene.add('PregameStage', PregameStage);
+        this.scene.bringToTop('PregameStage');
+        this.scene.launch('PregameStage');
+      }
     });
 
     this.socket.on('server_playAgainGranted', () => {
       this.scene.remove('PostgameStage');
-      this.scene.add('WaitingStage', WaitingStage);
-      this.scene.bringToTop('WaitingStage');
-      this.scene.launch('WaitingStage');
+      this.scene.add('PregameStage', PregameStage);
+      this.scene.bringToTop('PregameStage');
+      this.scene.launch('PregameStage');
     });
 
     this.socket.on('server_gameStarted', (startData) => {
-      this.scene.remove('WaitingStage');
+      this.scene.remove('PregameStage');
       this.registry.set('gameRoomOccupants', startData.players);
       this.registry.set('startTime', startData.startTime);
       this.registry.set('gameDuration', startData.gameDuration);

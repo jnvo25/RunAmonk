@@ -2,9 +2,9 @@
 import Button from './button.js';
 
 // eslint-disable-next-line no-undef
-export default class WaitingStage extends Phaser.Scene {
+export default class PregameStage extends Phaser.Scene {
   constructor() {
-    super('WaitingStage');
+    super('PregameStage');
     this.playerCircles = new Set();
   }
 
@@ -24,9 +24,9 @@ export default class WaitingStage extends Phaser.Scene {
 
   setupSockets() {
     // Updates when waiting room queue changes
-    this.socket.on('server_waitingRoomUpdate', (waitingRoomPlayers) => {
-      const readyPlayers = waitingRoomPlayers.filter((player) => player.isReady).length;
-      this.updatePlayerCircles(readyPlayers, waitingRoomPlayers.length);
+    this.socket.on('server_pregameRoomUpdate', (pregameRoomPlayers) => {
+      const readyPlayers = pregameRoomPlayers.filter((player) => player.isReady).length;
+      this.updatePlayerCircles(readyPlayers, pregameRoomPlayers.length);
     });
   }
 

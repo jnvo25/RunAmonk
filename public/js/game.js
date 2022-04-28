@@ -10,11 +10,9 @@ module.exports = class Game {
 
   addPlayer(socketId) {
     Game.verifyValidSocketId(socketId);
-    if (this.gameStatus === GAME_STATUS.PLAYING) {
-      this.players.get('waiting').set(socketId, new Player());
-    } else {
-      this.players.get('pregame').set(socketId, new Player());
-    }
+    const roomToPlace = (this.gameStatus === GAME_STATUS.PLAYING) ? 'waiting' : 'pregame';
+    this.players.get(roomToPlace).set(socketId, new Player());
+    return roomToPlace;
   }
 
   startGame() {

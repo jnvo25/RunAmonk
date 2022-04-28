@@ -24,9 +24,10 @@ const Game = new GameObject();
 
 // Handle connections
 io.on('connection', (socket) => {
-  socket.emit('welcome', socket.id);
-
-  Game.addPlayer(socket.id);
+  socket.emit('welcome', {
+    socketId: socket.id,
+    playerRoom: Game.addPlayer(socket.id),
+  });
 
   socket.on('disconnect', () => {
     Game.deletePlayer(socket.id);
@@ -46,7 +47,7 @@ io.on('connection', (socket) => {
         gameDuration: Game.gameDuration,
       });
     } else {
-      io.emit('server_waitingRoomUpdate', Array.from(Game.players.get('waiting').values()));
+      io.emit('server_pregameRoomUpdate', Array.from(Game.players.get('pregame').values()));
     }
   });
 
