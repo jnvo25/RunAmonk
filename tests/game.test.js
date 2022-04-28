@@ -124,4 +124,16 @@ describe('Game Class', () => {
     tempGame.startPregame();
     expect(tempGame.gameStatus).toBe(GAME_STATUS.IDLE);
   });
+
+  test('Player joining game in the middle put into waiting room', () => {
+    const tempGame = new Game();
+    tempGame.addPlayer('g6yhft5r4dswerdtguji');
+    tempGame.addPlayer('jki9okpi0ijuhyg6trfd');
+    tempGame.updateReadyPlayer('jki9okpi0ijuhyg6trfd');
+    tempGame.updateReadyPlayer('g6yhft5r4dswerdtguji');
+    tempGame.startGame();
+
+    tempGame.addPlayer('0kjhytfds4yu7y6fdsaw');
+    expect(tempGame.getPlayerRoom('0kjhytfds4yu7y6fdsaw')).toBe('waiting');
+  });
 });
