@@ -23,7 +23,7 @@ module.exports = class Game {
     this.players.get('pregame').set(socketId, new Player());
   }
 
-  startGame(callback = () => {}) {
+  startGame() {
     if (!this.readyToStart) throw new Error('Game is not ready to start');
     if (this.startTime !== undefined) throw new Error('Error starting game, start time exists');
 
@@ -37,14 +37,6 @@ module.exports = class Game {
 
     // Start timer
     this.startTime = Date.now();
-
-    // Use callback when finished
-    setTimeout(() => {
-      callback();
-      console.log("TIMEOUT DONE");
-      this.gameStatus = config.GAME_STATUS.IDLE;
-      this.startPregame();
-    }, this.gameDuration);
 
     this.gameStatus = config.GAME_STATUS.PLAYING;
   }
