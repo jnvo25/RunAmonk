@@ -109,4 +109,19 @@ describe('Game Class', () => {
       value = iterator.next();
     }
   });
+
+  test('gameStatus correctly reflect game status', () => {
+    const tempGame = new Game();
+    tempGame.addPlayer('g6yhft5r4dswerdtguji');
+    tempGame.addPlayer('jki9okpi0ijuhyg6trfd');
+    tempGame.updateReadyPlayer('jki9okpi0ijuhyg6trfd');
+    tempGame.updateReadyPlayer('g6yhft5r4dswerdtguji');
+    expect(tempGame.gameStatus).toBe(GAME_STATUS.IDLE);
+    tempGame.startGame();
+    expect(tempGame.gameStatus).toBe(GAME_STATUS.PLAYING);
+    jest.useFakeTimers().setSystemTime(getFutureDate(100));
+    expect(tempGame.gameStatus).toBe(GAME_STATUS.IDLE);
+    tempGame.startPregame();
+    expect(tempGame.gameStatus).toBe(GAME_STATUS.IDLE);
+  });
 });

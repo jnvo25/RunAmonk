@@ -14,7 +14,6 @@ module.exports = class Game {
     this.players = new Map(GAME_ROOMS.map((room) => [room, new Map()]));
     this.startTime = undefined;
     this.gameDuration = GAME_DURATION;
-    this.gameStatus = config.GAME_STATUS.IDLE;
   }
 
   addPlayer(socketId) {
@@ -37,8 +36,6 @@ module.exports = class Game {
 
     // Start timer
     this.startTime = Date.now();
-
-    this.gameStatus = config.GAME_STATUS.PLAYING;
   }
 
   isGameOver() {
@@ -95,7 +92,6 @@ module.exports = class Game {
     });
 
     this.startTime = undefined;
-    this.gameStatus = config.GAME_STATUS.IDLE;
   }
 
   get readyToStart() {
@@ -121,6 +117,14 @@ module.exports = class Game {
 
   get gamePlayers() {
     return this.players.get('game').keys();
+  }
+
+  get gameStatus() {
+    // If there is a start time, game is in session
+    if (this.startTime && Date.now() - this.startTime < this.gameDuration) {
+      return config.GAME_STATUS.PLAYING;
+    }
+    return config.GAME_STATUS.IDLE;
   }
 
   static verifyValidSocketId(socketId) {
