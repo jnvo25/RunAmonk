@@ -1,13 +1,5 @@
 const Player = require('./player');
-const config = require('./config');
-
-const GAME_DURATION = 100 * 1000; // Seconds to MS
-
-const GAME_ROOMS = [
-  'waiting',
-  'pregame',
-  'game',
-];
+const { GAME_STATUS, GAME_DURATION, GAME_ROOMS } = require('./config');
 
 module.exports = class Game {
   constructor() {
@@ -18,7 +10,7 @@ module.exports = class Game {
 
   addPlayer(socketId) {
     Game.verifyValidSocketId(socketId);
-    if (this.gameStatus === config.GAME_STATUS.PLAYING) {
+    if (this.gameStatus === GAME_STATUS.PLAYING) {
       this.players.get('waiting').set(socketId, new Player());
     } else {
       this.players.get('pregame').set(socketId, new Player());
@@ -125,9 +117,9 @@ module.exports = class Game {
   get gameStatus() {
     // If there is a start time, game is in session
     if (this.startTime && Date.now() - this.startTime < this.gameDuration) {
-      return config.GAME_STATUS.PLAYING;
+      return GAME_STATUS.PLAYING;
     }
-    return config.GAME_STATUS.IDLE;
+    return GAME_STATUS.IDLE;
   }
 
   static verifyValidSocketId(socketId) {
