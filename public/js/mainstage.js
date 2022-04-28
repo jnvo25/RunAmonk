@@ -4,6 +4,13 @@ import GameStage from './gamestage.js';
 import PostgameStage from './postgamestage.js';
 import WaitingStage from './waitingstage.js';
 
+const SCENES = {
+  PregameStage,
+  GameStage,
+  PostgameStage,
+  WaitingStage,
+};
+
 // eslint-disable-next-line no-undef
 export default class MainStage extends Phaser.Scene {
   constructor() {
@@ -29,38 +36,37 @@ export default class MainStage extends Phaser.Scene {
       if (welcomeInfo.playerRoom === 'waiting') {
         this.registry.set('startTime', welcomeInfo.startTime);
         this.registry.set('gameDuration', welcomeInfo.gameDuration);
-        this.scene.add('WaitingStage', WaitingStage);
-        this.scene.bringToTop('WaitingStage');
-        this.scene.launch('WaitingStage');
+        this.launchNewScene(SCENES.WaitingStage);
       } else {
-        this.scene.add('PregameStage', PregameStage);
-        this.scene.bringToTop('PregameStage');
-        this.scene.launch('PregameStage');
+        this.launchNewScene(SCENES.PregameStage);
       }
     });
 
     this.socket.on('server_playAgainGranted', () => {
-      this.scene.remove('PostgameStage');
-      this.scene.add('PregameStage', PregameStage);
-      this.scene.bringToTop('PregameStage');
-      this.scene.launch('PregameStage');
+      this.launchNewScene(SCENES.PregameStage);
     });
 
     this.socket.on('server_gameStarted', (startData) => {
-      this.scene.remove('PregameStage');
       this.registry.set('gameRoomOccupants', startData.players);
       this.registry.set('startTime', startData.startTime);
       this.registry.set('gameDuration', startData.gameDuration);
-      this.scene.add('GameStage', GameStage);
-      this.scene.bringToTop('GameStage');
-      this.scene.launch('GameStage');
+      this.launchNewScene(SCENES.GameStage);
     });
 
     this.socket.on('server_gameOver', () => {
-      this.scene.add('PostgameStage', PostgameStage);
-      this.scene.remove('GameStage');
-      this.scene.bringToTop('PostgameStage');
-      this.scene.launch('PostgameStage');
+      this.launchNewScene(SCENES.PostgameStage);
     });
+  }
+
+  launchNewScene(scene) {
+    this.scene.manager.getScenes(true, true).forEach((e) => {
+      const elementName = e.scene.key.toString();
+      if (elementName !== 'MainStage') {
+        this.scene.remove(elementName);
+      }
+    });
+    this.scene.add(scene.name, scene);
+    this.scene.bringToTop(scene.name);
+    this.scene.launch(scene.name);
   }
 }
