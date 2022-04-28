@@ -1,7 +1,8 @@
 /* eslint-disable import/extensions */
-import PregameStage from './PregameStage.js';
+import PregameStage from './pregamestage.js';
 import GameStage from './gamestage.js';
 import PostgameStage from './postgamestage.js';
+import WaitingStage from './waitingstage.js';
 
 // eslint-disable-next-line no-undef
 export default class MainStage extends Phaser.Scene {
@@ -26,12 +27,10 @@ export default class MainStage extends Phaser.Scene {
     this.socket.on('welcome', (welcomeInfo) => {
       this.registry.set('socketId', welcomeInfo.socketId);
       if (welcomeInfo.playerRoom === 'waiting') {
-        // Display WaitingRoom
-        this.scene.add('PregameStage', PregameStage);
-        this.scene.bringToTop('PregameStage');
-        this.scene.launch('PregameStage');
+        this.scene.add('WaitingStage', WaitingStage);
+        this.scene.bringToTop('WaitingStage');
+        this.scene.launch('WaitingStage');
       } else {
-        // Display WaitingRoom
         this.scene.add('PregameStage', PregameStage);
         this.scene.bringToTop('PregameStage');
         this.scene.launch('PregameStage');
