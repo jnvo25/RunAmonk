@@ -27,6 +27,8 @@ export default class MainStage extends Phaser.Scene {
     this.socket.on('welcome', (welcomeInfo) => {
       this.registry.set('socketId', welcomeInfo.socketId);
       if (welcomeInfo.playerRoom === 'waiting') {
+        this.registry.set('startTime', welcomeInfo.startTime);
+        this.registry.set('gameDuration', welcomeInfo.gameDuration);
         this.scene.add('WaitingStage', WaitingStage);
         this.scene.bringToTop('WaitingStage');
         this.scene.launch('WaitingStage');

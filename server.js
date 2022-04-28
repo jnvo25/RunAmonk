@@ -1,6 +1,7 @@
 // Setup Express server
 const express = require('express');
 const path = require('path');
+const { GAME_STATUS } = require('./public/js/config');
 
 const app = express();
 const server = require('http').Server(app);
@@ -27,6 +28,10 @@ io.on('connection', (socket) => {
   socket.emit('welcome', {
     socketId: socket.id,
     playerRoom: Game.addPlayer(socket.id),
+    ...(Game.gameStatus === GAME_STATUS.PLAYING && {
+      startTime: Game.startTime,
+      gameDuration: Game.gameDuration,
+    }),
   });
 
   socket.on('disconnect', () => {
