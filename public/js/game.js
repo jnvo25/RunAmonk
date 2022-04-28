@@ -1,5 +1,7 @@
 const Player = require('./player');
-const { GAME_STATUS, GAME_DURATION, GAME_ROOMS } = require('./config');
+const {
+  GAME_STATUS, GAME_DURATION, GAME_ROOMS, SPAWN_COORDS,
+} = require('./config');
 
 module.exports = class Game {
   constructor() {
@@ -22,11 +24,12 @@ module.exports = class Game {
     if (!this.readyToStart) throw new Error('Game is not ready to start');
     if (this.startTime !== undefined) throw new Error('Error starting game, start time exists');
 
-    // Move all players from pregame to game state
+    // Move all players from pregame to game state and assign coordinate
     const iterator = this.players.get(GAME_ROOMS.PREGAME).keys();
     let iteratorResult = iterator.next();
     while (!iteratorResult.done) {
       this.movePlayer(iteratorResult.value, GAME_ROOMS.GAME);
+      this.updatePlayerPosition(iteratorResult.value, SPAWN_COORDS[0]); // TODO: Randomize spawn coordinates
       iteratorResult = iterator.next();
     }
 
@@ -75,6 +78,12 @@ module.exports = class Game {
     // Copy to new and delete original
     this.players.get(room).set(socketId, tempPlayer);
     this.players.get(playerState).delete(socketId);
+  }
+
+  updatePlayerPosition(socketId, { x, y }) {
+    Game.verifyValidSocketId(socketId);
+
+    this.getPlayer(socketId, GAME_ROOMS.GAME).position = { x, y };
   }
 
   updateReadyPlayer(socketId) {

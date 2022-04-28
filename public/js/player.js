@@ -3,11 +3,13 @@ module.exports = class Player {
     this.character = undefined;
     this.isReady = false;
     this.isTagged = false;
+    this.position = undefined;
   }
 
   reset() {
     this.character = undefined;
     this.isReady = false;
     this.isTagged = false;
+    this.position = undefined;
   }
 };

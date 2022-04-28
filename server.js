@@ -1,11 +1,11 @@
 // Setup Express server
 const express = require('express');
 const path = require('path');
-const { GAME_STATUS } = require('./public/js/config');
 
 const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
+const { GAME_STATUS } = require('./public/js/config');
 
 app.use(express.static(path.join(__dirname, '/public')));
 
@@ -47,7 +47,7 @@ io.on('connection', (socket) => {
         Game.startPregame();
       }, Game.gameDuration);
       io.emit('server_gameStarted', {
-        players: Game.players.get('game'),
+        players: Array.from(Game.players.get('game').entries()),
         startTime: Game.startTime,
         gameDuration: Game.gameDuration,
       });

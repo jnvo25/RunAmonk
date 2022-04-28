@@ -66,7 +66,7 @@ describe('Game Class', () => {
     expect(tempGame.readyToStart).toBeTruthy();
   });
 
-  test('start game by moving all players from pregame to game', () => {
+  test('start game by moving all players from pregame to game and setting coordinates', () => {
     const tempGame = new Game();
     tempGame.addPlayer('g6yhft5r4dswerdtguji');
     tempGame.addPlayer('jki9okpi0ijuhyg6trfd');
@@ -75,6 +75,10 @@ describe('Game Class', () => {
     tempGame.startGame();
     expect(tempGame.getPlayerRoom('jki9okpi0ijuhyg6trfd')).toEqual('game');
     expect(tempGame.getPlayerRoom('g6yhft5r4dswerdtguji')).toEqual('game');
+    expect(tempGame.getPlayer('jki9okpi0ijuhyg6trfd').position).toHaveProperty('x');
+    expect(tempGame.getPlayer('jki9okpi0ijuhyg6trfd').position).toHaveProperty('y');
+    expect(tempGame.getPlayer('g6yhft5r4dswerdtguji').position).toHaveProperty('x');
+    expect(tempGame.getPlayer('g6yhft5r4dswerdtguji').position).toHaveProperty('y');
   });
 
   test('start game, wait 100 seconds, check if game ended', () => {
@@ -108,6 +112,8 @@ describe('Game Class', () => {
       expect(value.value.isReady).toBeFalsy();
       value = iterator.next();
     }
+    expect(tempGame.getPlayer('jki9okpi0ijuhyg6trfd').position).toBeUndefined();
+    expect(tempGame.getPlayer('g6yhft5r4dswerdtguji').position).toBeUndefined();
   });
 
   test('gameStatus correctly reflect game status', () => {

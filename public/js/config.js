@@ -11,4 +11,8 @@ const GAME_ROOMS = {
   GAME: 'game',
 };
 
-module.exports = { GAME_STATUS, GAME_DURATION, GAME_ROOMS };
+const SPAWN_COORDS = [{ x: 400, y: 400 }, { x: 700, y: 300 }, { x: 100, y: 300 }];
+
+module.exports = {
+  GAME_STATUS, GAME_DURATION, GAME_ROOMS, SPAWN_COORDS,
+};
