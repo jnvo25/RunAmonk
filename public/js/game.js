@@ -1,7 +1,7 @@
 const Player = require('./player');
 const config = require('./config');
 
-const GAME_DURATION = 1 * 1000; // Seconds to MS
+const GAME_DURATION = 100 * 1000; // Seconds to MS
 
 const GAME_ROOMS = [
   'waiting',
