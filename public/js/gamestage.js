@@ -1,6 +1,8 @@
-function getTime(startTime, gameDuration) {
-  return Math.floor((gameDuration / 1000) - (Date.now() - startTime) / 1000);
-}
+// eslint-disable-next-line import/extensions
+import helpers from './helpers.js';
+
+const { getTime } = helpers;
+
 // eslint-disable-next-line no-undef
 export default class GameStage extends Phaser.Scene {
   constructor() {
@@ -64,14 +66,14 @@ export default class GameStage extends Phaser.Scene {
     if (this.cursors.left.isDown) {
       playerSprite.setVelocityX(-160);
       playerSprite.setFlipX(true);
-      playerSprite.anims.play(`${playerSprite.char}-run`, true);
+      playerSprite.anims.play(`${playerSprite.character}-run`, true);
     } else if (this.cursors.right.isDown) {
       playerSprite.setVelocityX(160);
       playerSprite.setFlipX(false);
-      playerSprite.anims.play(`${playerSprite.char}-run`, true);
+      playerSprite.anims.play(`${playerSprite.character}-run`, true);
     } else {
       playerSprite.setVelocityX(0);
-      playerSprite.anims.play(`${playerSprite.char}-idle`, true);
+      playerSprite.anims.play(`${playerSprite.character}-idle`, true);
     }
   }
 

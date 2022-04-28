@@ -6,8 +6,8 @@ module.exports = class Player {
   }
 
   reset() {
+    this.character = undefined;
     this.isReady = false;
     this.isTagged = false;
-    this.character = undefined;
   }
 };

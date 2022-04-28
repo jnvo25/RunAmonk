@@ -10,6 +10,8 @@ module.exports = class Game {
 
   addPlayer(socketId) {
     Game.verifyValidSocketId(socketId);
+
+    // Calculate room to put player and place them there
     const roomToPlace = (this.gameStatus === GAME_STATUS.PLAYING)
       ? GAME_ROOMS.WAITING : GAME_ROOMS.PREGAME;
     this.players.get(roomToPlace).set(socketId, new Player());
@@ -22,10 +24,10 @@ module.exports = class Game {
 
     // Move all players from pregame to game state
     const iterator = this.players.get(GAME_ROOMS.PREGAME).keys();
-    let value = iterator.next();
-    while (!value.done) {
-      this.movePlayer(value.value, GAME_ROOMS.GAME);
-      value = iterator.next();
+    let iteratorResult = iterator.next();
+    while (!iteratorResult.done) {
+      this.movePlayer(iteratorResult.value, GAME_ROOMS.GAME);
+      iteratorResult = iterator.next();
     }
 
     // Start timer
@@ -34,20 +36,27 @@ module.exports = class Game {
 
   isGameOver() {
     if (this.startTime === undefined) throw new Error('Game has not started yet');
+
     return (Date.now() - this.startTime >= this.gameDuration);
   }
 
   getPlayerRoom(socketId) {
     Game.verifyValidSocketId(socketId);
 
-    // Get all state maps and iterate
+    // Iterate through maps and return room containing socketId
     const iterator = this.players.entries();
-    let value = iterator.next();
-    while (!value.done) {
-      if (value.value[1].has(socketId)) return value.value[0];
-      value = iterator.next();
+    let iteratorResult = iterator.next();
+    while (!iteratorResult.done) {
+      if (iteratorResult.value[1].has(socketId)) return iteratorResult.value[0];
+      iteratorResult = iterator.next();
     }
+
     throw new Error(`Unable to find player with socketId: ${socketId}`);
+  }
+
+  getPlayer(socketId, roomName = undefined) {
+    if (roomName) return this.players.get(roomName).get(socketId);
+    return this.players.get(this.getPlayerRoom(socketId)).get(socketId);
   }
 
   deletePlayer(socketId) {
@@ -73,16 +82,19 @@ module.exports = class Game {
 
     // Get waiting player object and set isReady property
     if (!this.players.get(GAME_ROOMS.PREGAME).has(socketId)) throw new Error(`There is no player with socketId, ${socketId}, in the pregame map`);
-    this.players.get(GAME_ROOMS.PREGAME).get(socketId).isReady = true;
+
+    this.getPlayer(socketId, GAME_ROOMS.PREGAME).isReady = true;
   }
 
   startPregame() {
-    // Move all players from waiting and game room to pregame room
+    // Get players from waiting and game rooms
     const waitingPlayerIds = Array.from(this.players.get(GAME_ROOMS.WAITING).keys());
     const gamePlayerIds = Array.from(this.players.get(GAME_ROOMS.GAME).keys());
-    waitingPlayerIds.concat(gamePlayerIds).forEach((id) => {
-      this.movePlayer(id, GAME_ROOMS.PREGAME);
-      this.players.get(GAME_ROOMS.PREGAME).get(id).isReady = false;
+
+    // Combine rooms and move players to pregame
+    waitingPlayerIds.concat(gamePlayerIds).forEach((socketId) => {
+      this.movePlayer(socketId, GAME_ROOMS.PREGAME);
+      this.getPlayer(socketId, GAME_ROOMS.PREGAME).reset();
     });
 
     this.startTime = undefined;
@@ -91,12 +103,14 @@ module.exports = class Game {
   get readyToStart() {
     if (this.startTime !== undefined) return false;
 
+    // Check if all players in pregame room are ready
     const iterator = this.players.get(GAME_ROOMS.PREGAME).values();
-    let value = iterator.next();
-    while (!value.done) {
-      if (!value.value.isReady) return false;
-      value = iterator.next();
+    let iteratorResult = iterator.next();
+    while (!iteratorResult.done) {
+      if (!iteratorResult.value.isReady) return false;
+      iteratorResult = iterator.next();
     }
+
     // TODO: Make sure there are more than 1 ready player
     return true;
   }
