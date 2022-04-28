@@ -3,14 +3,15 @@ const { GAME_STATUS, GAME_DURATION, GAME_ROOMS } = require('./config');
 
 module.exports = class Game {
   constructor() {
-    this.players = new Map(GAME_ROOMS.map((room) => [room, new Map()]));
+    this.players = new Map(Array.from(Object.values(GAME_ROOMS)).map((room) => [room, new Map()]));
     this.startTime = undefined;
     this.gameDuration = GAME_DURATION;
   }
 
   addPlayer(socketId) {
     Game.verifyValidSocketId(socketId);
-    const roomToPlace = (this.gameStatus === GAME_STATUS.PLAYING) ? 'waiting' : 'pregame';
+    const roomToPlace = (this.gameStatus === GAME_STATUS.PLAYING)
+      ? GAME_ROOMS.WAITING : GAME_ROOMS.PREGAME;
     this.players.get(roomToPlace).set(socketId, new Player());
     return roomToPlace;
   }
@@ -20,10 +21,10 @@ module.exports = class Game {
     if (this.startTime !== undefined) throw new Error('Error starting game, start time exists');
 
     // Move all players from pregame to game state
-    const iterator = this.players.get('pregame').keys();
+    const iterator = this.players.get(GAME_ROOMS.PREGAME).keys();
     let value = iterator.next();
     while (!value.done) {
-      this.movePlayer(value.value, 'game');
+      this.movePlayer(value.value, GAME_ROOMS.GAME);
       value = iterator.next();
     }
 
@@ -71,17 +72,17 @@ module.exports = class Game {
     Game.verifyValidSocketId(socketId);
 
     // Get waiting player object and set isReady property
-    if (!this.players.get('pregame').has(socketId)) throw new Error(`There is no player with socketId, ${socketId}, in the pregame map`);
-    this.players.get('pregame').get(socketId).isReady = true;
+    if (!this.players.get(GAME_ROOMS.PREGAME).has(socketId)) throw new Error(`There is no player with socketId, ${socketId}, in the pregame map`);
+    this.players.get(GAME_ROOMS.PREGAME).get(socketId).isReady = true;
   }
 
   startPregame() {
     // Move all players from waiting and game room to pregame room
-    const waitingPlayerIds = Array.from(this.players.get('waiting').keys());
-    const gamePlayerIds = Array.from(this.players.get('game').keys());
+    const waitingPlayerIds = Array.from(this.players.get(GAME_ROOMS.WAITING).keys());
+    const gamePlayerIds = Array.from(this.players.get(GAME_ROOMS.GAME).keys());
     waitingPlayerIds.concat(gamePlayerIds).forEach((id) => {
-      this.movePlayer(id, 'pregame');
-      this.players.get('pregame').get(id).isReady = false;
+      this.movePlayer(id, GAME_ROOMS.PREGAME);
+      this.players.get(GAME_ROOMS.PREGAME).get(id).isReady = false;
     });
 
     this.startTime = undefined;
@@ -90,7 +91,7 @@ module.exports = class Game {
   get readyToStart() {
     if (this.startTime !== undefined) return false;
 
-    const iterator = this.players.get('pregame').values();
+    const iterator = this.players.get(GAME_ROOMS.PREGAME).values();
     let value = iterator.next();
     while (!value.done) {
       if (!value.value.isReady) return false;
@@ -101,15 +102,15 @@ module.exports = class Game {
   }
 
   get waitingPlayers() {
-    return this.players.get('waiting').keys();
+    return this.players.get(GAME_ROOMS.WAITING).keys();
   }
 
   get pregamePlayers() {
-    return this.players.get('pregame').keys();
+    return this.players.get(GAME_ROOMS.PREGAME).keys();
   }
 
   get gamePlayers() {
-    return this.players.get('game').keys();
+    return this.players.get(GAME_ROOMS.GAME).keys();
   }
 
   get gameStatus() {
@@ -125,6 +126,6 @@ module.exports = class Game {
   }
 
   static verifyValidRoom(room) {
-    if (GAME_ROOMS.indexOf(room) === -1) throw new Error(`Invalid room: ${room}`);
+    if (!Object.values(GAME_ROOMS).includes(room)) throw new Error(`Invalid room: ${room}`);
   }
 };

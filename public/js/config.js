@@ -5,10 +5,10 @@ const GAME_STATUS = {
 
 const GAME_DURATION = 100 * 1000; // Seconds to MS
 
-const GAME_ROOMS = [
-  'waiting',
-  'pregame',
-  'game',
-];
+const GAME_ROOMS = {
+  WAITING: 'waiting',
+  PREGAME: 'pregame',
+  GAME: 'game',
+};
 
 module.exports = { GAME_STATUS, GAME_DURATION, GAME_ROOMS };
