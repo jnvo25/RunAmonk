@@ -1,8 +1,9 @@
 const Player = require('./player');
+const config = require('./config');
 
-const GAME_DURATION = 100 * 1000; // Seconds to MS
+const GAME_DURATION = 1 * 1000; // Seconds to MS
 
-const GAME_STATUS = [
+const GAME_ROOMS = [
   'waiting',
   'pregame',
   'game',
@@ -10,9 +11,10 @@ const GAME_STATUS = [
 
 module.exports = class Game {
   constructor() {
-    this.players = new Map(GAME_STATUS.map((status) => [status, new Map()]));
+    this.players = new Map(GAME_ROOMS.map((room) => [room, new Map()]));
     this.startTime = undefined;
     this.gameDuration = GAME_DURATION;
+    this.gameStatus = config.GAME_STATUS.IDLE;
   }
 
   addPlayer(socketId) {
@@ -21,7 +23,7 @@ module.exports = class Game {
     this.players.get('pregame').set(socketId, new Player());
   }
 
-  startGame() {
+  startGame(callback = () => {}) {
     if (!this.readyToStart) throw new Error('Game is not ready to start');
     if (this.startTime !== undefined) throw new Error('Error starting game, start time exists');
 
@@ -35,6 +37,16 @@ module.exports = class Game {
 
     // Start timer
     this.startTime = Date.now();
+
+    // Use callback when finished
+    setTimeout(() => {
+      callback();
+      console.log("TIMEOUT DONE");
+      this.gameStatus = config.GAME_STATUS.IDLE;
+      this.startPregame();
+    }, this.gameDuration);
+
+    this.gameStatus = config.GAME_STATUS.PLAYING;
   }
 
   isGameOver() {
@@ -42,7 +54,7 @@ module.exports = class Game {
     return (Date.now() - this.startTime >= this.gameDuration);
   }
 
-  getPlayerStatus(socketId) {
+  getPlayerRoom(socketId) {
     Game.verifyValidSocketId(socketId);
 
     // Get all state maps and iterate
@@ -57,19 +69,19 @@ module.exports = class Game {
 
   deletePlayer(socketId) {
     Game.verifyValidSocketId(socketId);
-    this.players.get(this.getPlayerStatus(socketId)).delete(socketId);
+    this.players.get(this.getPlayerRoom(socketId)).delete(socketId);
   }
 
-  movePlayer(socketId, status) {
+  movePlayer(socketId, room) {
     Game.verifyValidSocketId(socketId);
-    Game.verifyValidStatus(status);
+    Game.verifyValidRoom(room);
 
     // Get player information
-    const playerState = this.getPlayerStatus(socketId);
+    const playerState = this.getPlayerRoom(socketId);
     const tempPlayer = this.players.get(playerState).get(socketId);
 
     // Copy to new and delete original
-    this.players.get(status).set(socketId, tempPlayer);
+    this.players.get(room).set(socketId, tempPlayer);
     this.players.get(playerState).delete(socketId);
   }
 
@@ -91,6 +103,7 @@ module.exports = class Game {
     });
 
     this.startTime = undefined;
+    this.gameStatus = config.GAME_STATUS.IDLE;
   }
 
   get readyToStart() {
@@ -122,7 +135,7 @@ module.exports = class Game {
     if (socketId.length !== 20) throw new Error(`Invalid socket id: ${socketId}`);
   }
 
-  static verifyValidStatus(status) {
-    if (GAME_STATUS.indexOf(status) === -1) throw new Error(`Invalid status: ${status}`);
+  static verifyValidRoom(room) {
+    if (GAME_ROOMS.indexOf(room) === -1) throw new Error(`Invalid room: ${room}`);
   }
 };

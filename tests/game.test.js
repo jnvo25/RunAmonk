@@ -2,6 +2,7 @@ import {
   describe, expect, jest, test,
 } from '@jest/globals';
 
+import { GAME_STATUS } from '../public/js/config';
 import Game from '../public/js/game';
 
 function getFutureDate(seconds) {
@@ -25,7 +26,7 @@ describe('Game Class', () => {
   test('get player\'s status', () => {
     const tempGame = new Game();
     tempGame.addPlayer('0kjhytfds4yu7y6fdsaw');
-    expect(tempGame.getPlayerStatus('0kjhytfds4yu7y6fdsaw')).toBe('pregame');
+    expect(tempGame.getPlayerRoom('0kjhytfds4yu7y6fdsaw')).toBe('pregame');
   });
 
   test('delete player', () => {
@@ -34,17 +35,17 @@ describe('Game Class', () => {
     tempGame.deletePlayer('0kjhytfds4yu7y6fdsaw');
 
     expect(() => {
-      tempGame.getPlayerStatus('0kjhytfds4yu7y6fdsaw');
+      tempGame.getPlayerRoom('0kjhytfds4yu7y6fdsaw');
     }).toThrow(Error);
   });
 
   test('move new player from waiting to pregame status', () => {
     const tempGame = new Game();
     tempGame.addPlayer('juh7ygt5de0fkcru7hbg');
-    expect(tempGame.getPlayerStatus('juh7ygt5de0fkcru7hbg')).toBe('pregame');
+    expect(tempGame.getPlayerRoom('juh7ygt5de0fkcru7hbg')).toBe('pregame');
     tempGame.movePlayer('juh7ygt5de0fkcru7hbg', 'game');
 
-    expect(tempGame.getPlayerStatus('juh7ygt5de0fkcru7hbg')).toBe('game');
+    expect(tempGame.getPlayerRoom('juh7ygt5de0fkcru7hbg')).toBe('game');
     expect(Array.from(tempGame.pregamePlayers)).toHaveLength(0);
   });
 
@@ -72,8 +73,8 @@ describe('Game Class', () => {
     tempGame.updateReadyPlayer('jki9okpi0ijuhyg6trfd');
     tempGame.updateReadyPlayer('g6yhft5r4dswerdtguji');
     tempGame.startGame();
-    expect(tempGame.getPlayerStatus('jki9okpi0ijuhyg6trfd')).toEqual('game');
-    expect(tempGame.getPlayerStatus('g6yhft5r4dswerdtguji')).toEqual('game');
+    expect(tempGame.getPlayerRoom('jki9okpi0ijuhyg6trfd')).toEqual('game');
+    expect(tempGame.getPlayerRoom('g6yhft5r4dswerdtguji')).toEqual('game');
   });
 
   test('start game, wait 100 seconds, check if game ended', () => {
@@ -99,8 +100,8 @@ describe('Game Class', () => {
     tempGame.startPregame();
 
     // Both players should be in pregame stage and not ready
-    expect(tempGame.getPlayerStatus('jki9okpi0ijuhyg6trfd')).toBe('pregame');
-    expect(tempGame.getPlayerStatus('g6yhft5r4dswerdtguji')).toBe('pregame');
+    expect(tempGame.getPlayerRoom('jki9okpi0ijuhyg6trfd')).toBe('pregame');
+    expect(tempGame.getPlayerRoom('g6yhft5r4dswerdtguji')).toBe('pregame');
     const iterator = tempGame.players.get('pregame').values();
     let value = iterator.next();
     while (!value.done) {
