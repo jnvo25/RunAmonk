@@ -36,29 +36,29 @@ export default class MainStage extends Phaser.Scene {
       if (welcomeInfo.playerRoom === 'waiting') {
         this.registry.set('startTime', welcomeInfo.startTime);
         this.registry.set('gameDuration', welcomeInfo.gameDuration);
-        this.launchNewScene(SCENES.WaitingStage);
+        this.launchScene(SCENES.WaitingStage);
       } else {
-        this.launchNewScene(SCENES.PregameStage);
+        this.launchScene(SCENES.PregameStage);
       }
     });
 
     this.socket.on('server_playAgainGranted', () => {
-      this.launchNewScene(SCENES.PregameStage);
+      this.launchScene(SCENES.PregameStage);
     });
 
     this.socket.on('server_gameStarted', (startData) => {
       this.registry.set('gameRoomOccupants', startData.players);
       this.registry.set('startTime', startData.startTime);
       this.registry.set('gameDuration', startData.gameDuration);
-      this.launchNewScene(SCENES.GameStage);
+      this.launchScene(SCENES.GameStage);
     });
 
     this.socket.on('server_gameOver', () => {
-      this.launchNewScene(SCENES.PostgameStage);
+      this.launchScene(SCENES.PostgameStage);
     });
   }
 
-  launchNewScene(scene) {
+  launchScene(scene) {
     this.scene.manager.getScenes(true, true).forEach((e) => {
       const elementName = e.scene.key.toString();
       if (elementName !== 'MainStage') {
