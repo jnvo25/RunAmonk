@@ -133,10 +133,6 @@ export default class GameStage extends Phaser.Scene {
   }
 
   setupSockets() {
-    this.socket.on('server_playerUpdate', (gameRoomOccupants) => {
-      console.log('Server sent player update', gameRoomOccupants);
-    });
-
     this.socket.on('server_movementUpdate', ({
       velX, velY, flip, anim, socketId,
     }) => {
