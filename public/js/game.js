@@ -29,7 +29,8 @@ module.exports = class Game {
     let iteratorResult = iterator.next();
     while (!iteratorResult.done) {
       this.movePlayer(iteratorResult.value, GAME_ROOMS.GAME);
-      this.updatePlayerPosition(iteratorResult.value, SPAWN_COORDS[0]); // TODO: Randomize spawn coordinates
+      const randomCoordinate = SPAWN_COORDS[Math.floor(Math.random() * SPAWN_COORDS.length)];
+      this.updatePlayerPosition(iteratorResult.value, randomCoordinate);
       iteratorResult = iterator.next();
     }
 
@@ -55,6 +56,10 @@ module.exports = class Game {
     }
 
     throw new Error(`Unable to find player with socketId: ${socketId}`);
+  }
+
+  getPlayerPosition(socketId) {
+    return this.getPlayer(socketId, GAME_ROOMS.GAME).position;
   }
 
   getPlayer(socketId, roomName = undefined) {

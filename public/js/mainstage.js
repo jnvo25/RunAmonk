@@ -50,6 +50,7 @@ export default class MainStage extends Phaser.Scene {
       const gameRoomOccupants = new Map();
       startData.players.forEach((player) => {
         if (player[0] !== this.registry.get('socketId')) gameRoomOccupants.set(player[0], player[1]);
+        else this.registry.set('playerData', player[1]);
       });
       this.registry.set('gameRoomOccupants', gameRoomOccupants);
       this.registry.set('startTime', startData.startTime);

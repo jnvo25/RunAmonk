@@ -44,7 +44,7 @@ export default class GameStage extends Phaser.Scene {
     this.cursors = this.registry.get('cursors');
 
     // Create player
-    this.data.set('playerSprite', this.createPlayer(200, 200, 'monkee'));
+    this.data.set('playerSprite', this.createPlayer(this.registry.get('playerData').position.x, this.registry.get('playerData').position.y, 'monkee'));
 
     // Create other players
     const iterator = this.registry.get('gameRoomOccupants').entries();
@@ -52,6 +52,7 @@ export default class GameStage extends Phaser.Scene {
     let iteratorResult = iterator.next();
     while (!iteratorResult.done) {
       const playerData = iteratorResult.value[1];
+      console.log(playerData.position.x);
       otherPlayers.set(iteratorResult.value[0], this.createPlayer(playerData.position.x, playerData.position.y, 'monkee'));
       iteratorResult = iterator.next();
     }
