@@ -103,7 +103,8 @@ export default class GameStage extends Phaser.Scene {
         anim: playerSprite.anims.getName(),
       });
       this.data.set('playerPosition', playerPosition);
-    } else if (!this.data.get('positionLastUpdated') || Date.now() - this.data.get('positionLastUpdated') > 500) {
+    }
+    if (!this.data.get('positionLastUpdated') || Date.now() - this.data.get('positionLastUpdated') > 500) {
       this.registry.get('socket').emit('client_positionUpdate', {
         x: playerPosition.x,
         y: playerPosition.y,
