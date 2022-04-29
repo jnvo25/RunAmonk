@@ -142,4 +142,20 @@ describe('Game Class', () => {
     tempGame.addPlayer('0kjhytfds4yu7y6fdsaw');
     expect(tempGame.getPlayerRoom('0kjhytfds4yu7y6fdsaw')).toBe('waiting');
   });
+
+  test('Players generated with unique coordinates', () => {
+    // TODO:
+  });
+
+  test('Players generated with random characters', () => {
+    const tempGame = new Game();
+    tempGame.addPlayer('g6yhft5r4dswerdtguji');
+    tempGame.addPlayer('jki9okpi0ijuhyg6trfd');
+    tempGame.updateReadyPlayer('jki9okpi0ijuhyg6trfd');
+    tempGame.updateReadyPlayer('g6yhft5r4dswerdtguji');
+    tempGame.startGame();
+
+    expect(tempGame.getPlayer('jki9okpi0ijuhyg6trfd').character).toBeDefined();
+    expect(tempGame.getPlayer('g6yhft5r4dswerdtguji').character).toBeDefined();
+  });
 });

@@ -1,6 +1,6 @@
 const Player = require('./player');
 const {
-  GAME_STATUS, GAME_DURATION, GAME_ROOMS, SPAWN_COORDS,
+  GAME_STATUS, GAME_DURATION, GAME_ROOMS, SPAWN_COORDS, CHARACTERS,
 } = require('./config');
 
 module.exports = class Game {
@@ -31,6 +31,10 @@ module.exports = class Game {
       this.movePlayer(iteratorResult.value, GAME_ROOMS.GAME);
       const randomCoordinate = SPAWN_COORDS[Math.floor(Math.random() * SPAWN_COORDS.length)];
       this.updatePlayerPosition(iteratorResult.value, randomCoordinate);
+      this.updatePlayerCharacter(
+        iteratorResult.value,
+        CHARACTERS[Math.floor(Math.random() * CHARACTERS.length)],
+      );
       iteratorResult = iterator.next();
     }
 
@@ -89,6 +93,12 @@ module.exports = class Game {
     Game.verifyValidSocketId(socketId);
 
     this.getPlayer(socketId, GAME_ROOMS.GAME).position = { x, y };
+  }
+
+  updatePlayerCharacter(socketId, characterName) {
+    Game.verifyValidSocketId(socketId);
+
+    this.getPlayer(socketId, GAME_ROOMS.GAME).character = characterName;
   }
 
   updateReadyPlayer(socketId) {

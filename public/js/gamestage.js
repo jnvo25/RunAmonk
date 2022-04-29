@@ -14,6 +14,17 @@ export default class GameStage extends Phaser.Scene {
     this.load.spritesheet('monkee-idle', 'assets/Monkee_Monster/Monkee_Monster_Idle_18.png', { frameWidth: 32, frameHeight: 32 });
     this.load.spritesheet('monkee-run', 'assets/Monkee_Monster/Monkee_Monster_Run_8.png', { frameWidth: 32, frameHeight: 32 });
 
+    // Load Pinkie assets
+    this.load.spritesheet('pinkie-idle', 'assets/Pink_Monster/Pink_Monster_Idle_4.png', { frameWidth: 32, frameHeight: 32 });
+    this.load.spritesheet('pinkie-run', 'assets/Pink_Monster/Pink_Monster_Run_6.png', { frameWidth: 32, frameHeight: 32 });
+    this.load.spritesheet('pinkie-death', 'assets/Pink_Monster/Pink_Monster_Death_8.png', { frameWidth: 32, frameHeight: 32 });
+
+    // Load Owlet assets
+    this.load.spritesheet('owlet-idle', 'assets/Owlet_Monster/Owlet_Monster_Idle_4.png', { frameWidth: 32, frameHeight: 32 });
+    this.load.spritesheet('owlet-run', 'assets/Owlet_Monster/Owlet_Monster_Run_6.png', { frameWidth: 32, frameHeight: 32 });
+    this.load.spritesheet('owlet-jump', 'assets/Owlet_Monster/Owlet_Monster_Jump_8.png', { frameWidth: 32, frameHeight: 32 });
+    this.load.spritesheet('owlet-death', 'assets/Owlet_Monster/Owlet_Monster_Death_8.png', { frameWidth: 32, frameHeight: 32 });
+
     // Load stage assets
     this.load.image('background', 'assets/maps/images/background.png');
     this.load.image('spike', 'assets/maps/images/spike.png');
@@ -31,6 +42,14 @@ export default class GameStage extends Phaser.Scene {
     this.platforms.setCollisionByExclusion(-1, true);
 
     // Create animations
+    this.createAnimation('owlet-idle', 3, true);
+    this.createAnimation('owlet-run', 5, true);
+    this.createAnimation('owlet-death', 7, false);
+
+    this.createAnimation('pinkie-idle', 3, true);
+    this.createAnimation('pinkie-run', 5, true);
+    this.createAnimation('pinkie-death', 7, false);
+
     this.createAnimation('monkee-idle', 17, true);
     this.createAnimation('monkee-run', 7, true);
 
