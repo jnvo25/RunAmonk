@@ -55,7 +55,7 @@ export default class GameStage extends Phaser.Scene {
       otherPlayers.set(iteratorResult.value[0], this.createPlayer(playerData.position.x, playerData.position.y, 'monkee'));
       iteratorResult = iterator.next();
     }
-    this.data.set('otherPlayers', iteratorResult);
+    this.data.set('otherPlayers', otherPlayers);
 
     // Create timer
     this.timer = this.add.text(738, 35, (this.registry.get('gameDuration') - Date.now() - this.registry.get('startTime')), { backgroundColor: '#ffo', fontSize: '40px' }).setOrigin(0.5);
@@ -86,6 +86,29 @@ export default class GameStage extends Phaser.Scene {
       playerSprite.setVelocityX(0);
       playerSprite.anims.play(`${playerSprite.character}-idle`, true);
     }
+
+    const playerPosition = {
+      x: playerSprite.x,
+      y: playerSprite.y,
+      velX: playerSprite.body.velocity.x,
+      velY: playerSprite.body.velocity.y,
+      // flip: playerSprite.flipX,
+      // anim: playerSprite.anims.getName(),
+    };
+    if (!this.data.get('playerPosition')
+      || playerSprite.body.velocity.x !== this.data.get('playerPosition').velX
+      || playerSprite.body.velocity.y !== this.data.get('playerPosition').velY) {
+      this.registry.get('socket').emit('client_movementUpdate', {
+        velX: playerSprite.body.velocity.x,
+        velY: playerSprite.body.velocity.y,
+      });
+      this.data.set('playerPosition', playerPosition);
+    } else if (!this.data.get('positionLastUpdated') || Date.now() - this.data.get('positionLastUpdated') > 500) {
+      this.registry.get('socket').emit('client_positionUpdate', {
+        x: playerPosition.x,
+        y: playerPosition.y,
+      });
+    }
   }
 
   createPlayer(positionX, positionY, character) {
@@ -111,6 +134,17 @@ export default class GameStage extends Phaser.Scene {
   setupSockets() {
     this.socket.on('server_playerUpdate', (gameRoomOccupants) => {
       console.log('Server sent player update', gameRoomOccupants);
+    });
+
+    this.socket.on('server_movementUpdate', ({ velX, velY, socketId }) => {
+      const movedPlayerSprite = this.data.get('otherPlayers').get(socketId);
+      movedPlayerSprite.setVelocityX(velX);
+      movedPlayerSprite.setVelocityY(velY);
+    });
+
+    this.socket.on('server_positionUpdate', ({ x, y, socketId }) => {
+      const movedPlayerSprite = this.data.get('otherPlayers').get(socketId);
+      movedPlayerSprite.setPosition(x, y);
     });
   }
 
