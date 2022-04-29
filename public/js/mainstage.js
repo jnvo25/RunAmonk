@@ -17,6 +17,10 @@ export default class MainStage extends Phaser.Scene {
     super('MainStage');
   }
 
+  preload() {
+    this.load.plugin('PhaserSceneWatcherPlugin', 'https://cdn.jsdelivr.net/npm/phaser-plugin-scene-watcher@6.0.0/dist/phaser-plugin-scene-watcher.umd.js', true);
+  }
+
   create() {
     // Setup connections for socket.io
     // eslint-disable-next-line no-undef
@@ -67,7 +71,8 @@ export default class MainStage extends Phaser.Scene {
     this.scene.manager.getScenes(true, true).forEach((e) => {
       const elementName = e.scene.key.toString();
       if (elementName !== 'MainStage') {
-        this.scene.sleep(elementName);
+        console.log(elementName);
+        this.scene.stop(elementName);
       }
     });
     if (this.scene.isSleeping(scene.name) === null) {
@@ -75,7 +80,8 @@ export default class MainStage extends Phaser.Scene {
       this.scene.bringToTop(scene.name);
       this.scene.launch(scene.name);
     } else {
-      this.scene.wake(scene.name);
+      this.scene.launch(scene.name);
+      // this.scene.wake(scene.name);
     }
     // if (this.scene.get(scene.name) === undefined) this.scene.add(scene.name, scene);
   }
