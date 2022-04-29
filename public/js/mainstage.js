@@ -17,9 +17,9 @@ export default class MainStage extends Phaser.Scene {
     super('MainStage');
   }
 
-  preload() {
-    this.load.plugin('PhaserSceneWatcherPlugin', 'https://cdn.jsdelivr.net/npm/phaser-plugin-scene-watcher@6.0.0/dist/phaser-plugin-scene-watcher.umd.js', true);
-  }
+  // preload() {
+  //   this.load.plugin('PhaserSceneWatcherPlugin', 'https://cdn.jsdelivr.net/npm/phaser-plugin-scene-watcher@6.0.0/dist/phaser-plugin-scene-watcher.umd.js', true);
+  // }
 
   create() {
     // Setup connections for socket.io
@@ -71,7 +71,6 @@ export default class MainStage extends Phaser.Scene {
     this.scene.manager.getScenes(true, true).forEach((e) => {
       const elementName = e.scene.key.toString();
       if (elementName !== 'MainStage') {
-        console.log(elementName);
         this.scene.stop(elementName);
       }
     });
