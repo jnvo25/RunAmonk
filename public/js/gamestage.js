@@ -63,16 +63,17 @@ export default class GameStage extends Phaser.Scene {
     this.cursors = this.registry.get('cursors');
 
     // Create player
-    this.data.set('playerSprite', this.createPlayer(this.registry.get('playerData').position.x, this.registry.get('playerData').position.y, 'monkee'));
+    const playerData = this.registry.get('playerData');
+    this.data.set('playerSprite', this.createPlayer(playerData.position.x, playerData.position.y, playerData.character));
 
     // Create other players
     const iterator = this.registry.get('gameRoomOccupants').entries();
     const otherPlayers = new Map();
-    let iteratorResult = iterator.next();
-    while (!iteratorResult.done) {
-      const playerData = iteratorResult.value[1];
-      otherPlayers.set(iteratorResult.value[0], this.createPlayer(playerData.position.x, playerData.position.y, 'monkee'));
-      iteratorResult = iterator.next();
+    let iteratorData = iterator.next();
+    while (!iteratorData.done) {
+      const { position, character } = iteratorData.value[1];
+      otherPlayers.set(iteratorData.value[0], this.createPlayer(position.x, position.y, character));
+      iteratorData = iterator.next();
     }
     this.data.set('otherPlayers', otherPlayers);
 
