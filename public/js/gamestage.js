@@ -52,7 +52,6 @@ export default class GameStage extends Phaser.Scene {
     let iteratorResult = iterator.next();
     while (!iteratorResult.done) {
       const playerData = iteratorResult.value[1];
-      console.log(playerData.position.x);
       otherPlayers.set(iteratorResult.value[0], this.createPlayer(playerData.position.x, playerData.position.y, 'monkee'));
       iteratorResult = iterator.next();
     }
