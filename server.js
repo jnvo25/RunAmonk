@@ -60,8 +60,12 @@ io.on('connection', (socket) => {
     socket.emit('server_playAgainGranted');
   });
 
-  socket.on('client_movementUpdate', ({ velX, velY }) => {
-    socket.broadcast.emit('server_movementUpdate', { velX, velY, socketId: socket.id });
+  socket.on('client_movementUpdate', ({
+    velX, velY, flip, anim,
+  }) => {
+    socket.broadcast.emit('server_movementUpdate', {
+      velX, velY, flip, anim, socketId: socket.id,
+    });
   });
 
   socket.on('client_positionUpdate', ({ x, y }) => {

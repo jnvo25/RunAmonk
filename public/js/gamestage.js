@@ -92,8 +92,6 @@ export default class GameStage extends Phaser.Scene {
       y: playerSprite.y,
       velX: playerSprite.body.velocity.x,
       velY: playerSprite.body.velocity.y,
-      // flip: playerSprite.flipX,
-      // anim: playerSprite.anims.getName(),
     };
     if (!this.data.get('playerPosition')
       || playerSprite.body.velocity.x !== this.data.get('playerPosition').velX
@@ -101,6 +99,8 @@ export default class GameStage extends Phaser.Scene {
       this.registry.get('socket').emit('client_movementUpdate', {
         velX: playerSprite.body.velocity.x,
         velY: playerSprite.body.velocity.y,
+        flip: playerSprite.flipX,
+        anim: playerSprite.anims.getName(),
       });
       this.data.set('playerPosition', playerPosition);
     } else if (!this.data.get('positionLastUpdated') || Date.now() - this.data.get('positionLastUpdated') > 500) {
@@ -136,10 +136,14 @@ export default class GameStage extends Phaser.Scene {
       console.log('Server sent player update', gameRoomOccupants);
     });
 
-    this.socket.on('server_movementUpdate', ({ velX, velY, socketId }) => {
+    this.socket.on('server_movementUpdate', ({
+      velX, velY, flip, anim, socketId,
+    }) => {
       const movedPlayerSprite = this.data.get('otherPlayers').get(socketId);
       movedPlayerSprite.setVelocityX(velX);
       movedPlayerSprite.setVelocityY(velY);
+      movedPlayerSprite.setFlipX(flip);
+      movedPlayerSprite.anims.play(anim, true);
     });
 
     this.socket.on('server_positionUpdate', ({ x, y, socketId }) => {
