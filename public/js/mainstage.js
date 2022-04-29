@@ -66,11 +66,16 @@ export default class MainStage extends Phaser.Scene {
     this.scene.manager.getScenes(true, true).forEach((e) => {
       const elementName = e.scene.key.toString();
       if (elementName !== 'MainStage') {
-        this.scene.remove(elementName);
+        this.scene.sleep(elementName);
       }
     });
-    this.scene.add(scene.name, scene);
-    this.scene.bringToTop(scene.name);
-    this.scene.launch(scene.name);
+    if (this.scene.isSleeping(scene.name) === null) {
+      this.scene.add(scene.name, scene);
+      this.scene.bringToTop(scene.name);
+      this.scene.launch(scene.name);
+    } else {
+      this.scene.wake(scene.name);
+    }
+    // if (this.scene.get(scene.name) === undefined) this.scene.add(scene.name, scene);
   }
 }

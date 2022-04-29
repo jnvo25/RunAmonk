@@ -3,7 +3,7 @@ const GAME_STATUS = {
   PLAYING: 'playing',
 };
 
-const GAME_DURATION = 100 * 1000; // Seconds to MS
+const GAME_DURATION = 1 * 1000; // Seconds to MS
 
 const GAME_ROOMS = {
   WAITING: 'waiting',
