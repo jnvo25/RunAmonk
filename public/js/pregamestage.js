@@ -20,6 +20,7 @@ export default class PregameStage extends Phaser.Scene {
 
     // Updates when waiting room queue changes
     this.socket.on('server_pregameRoomUpdate', (pregameRoomPlayers) => {
+      console.log('pregame received', pregameRoomPlayers);
       const readyPlayers = pregameRoomPlayers.filter((player) => player.isReady).length;
       this.updatePlayerCircles(readyPlayers, pregameRoomPlayers.length);
     });

@@ -58,6 +58,7 @@ io.on('connection', (socket) => {
 
   socket.on('client_playAgain', () => {
     socket.emit('server_playAgainGranted');
+    io.emit('server_pregameRoomUpdate', Array.from(Game.players.get('pregame').values()));
   });
 
   socket.on('client_movementUpdate', ({
