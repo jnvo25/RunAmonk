@@ -153,7 +153,7 @@ describe('Game Class', () => {
     expect(tempGame.getPlayer('g6yhft5r4dswerdtguji').character).toBeDefined();
   });
 
-  test('Ensure at least one player is monkee', () => {
+  test('Ensure at least one player is chaser', () => {
     const tempGame = new Game();
     tempGame.addPlayer('g6yhft5r4dswerdtguji');
     tempGame.addPlayer('jki9okpi0ijuhyg6trfd');
@@ -167,12 +167,12 @@ describe('Game Class', () => {
 
     const iterator = tempGame.players.get('game').values();
     let value = iterator.next();
-    let monkeeFound = false;
-    while (!value.done || !monkeeFound) {
-      if (value.value.character === 'monkee') monkeeFound = true;
+    let chaserFound = false;
+    while (!value.done || !chaserFound) {
+      if (value.value.isChaser) chaserFound = true;
       value = iterator.next();
     }
-    expect(monkeeFound).toBeTruthy();
+    expect(chaserFound).toBeTruthy();
   });
 
   test('Game over when all players tagged', () => {

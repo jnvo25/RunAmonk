@@ -14,6 +14,10 @@ export default class GameStage extends Phaser.Scene {
     this.load.spritesheet('monkee-idle', 'assets/Monkee_Monster/Monkee_Monster_Idle_18.png', { frameWidth: 32, frameHeight: 32 });
     this.load.spritesheet('monkee-run', 'assets/Monkee_Monster/Monkee_Monster_Run_8.png', { frameWidth: 32, frameHeight: 32 });
 
+    // Load  Piggee assets
+    this.load.spritesheet('piggee-idle', 'assets/Piggee_Monster/Piggee_Monster_Idle_11.png', { frameWidth: 34, frameHeight: 28 });
+    this.load.spritesheet('piggee-run', 'assets/Piggee_Monster/Piggee_Monster_Run_6.png', { frameWidth: 34, frameHeight: 28 });
+
     // Load Pinkie assets
     this.load.spritesheet('pinkie-idle', 'assets/Pink_Monster/Pink_Monster_Idle_4.png', { frameWidth: 32, frameHeight: 32 });
     this.load.spritesheet('pinkie-run', 'assets/Pink_Monster/Pink_Monster_Run_6.png', { frameWidth: 32, frameHeight: 32 });
@@ -59,6 +63,9 @@ export default class GameStage extends Phaser.Scene {
     this.createAnimation('monkee-idle', 17, true);
     this.createAnimation('monkee-run', 7, true);
 
+    this.createAnimation('piggee-idle', 10, true);
+    this.createAnimation('piggee-run', 5, true);
+
     // Create sounds
     this.jump = this.sound.add('jump', { volume: 0.3, detune: 400 });
     this.background = this.sound.add('background', { volume: 0.2, detune: 200 });
@@ -71,30 +78,30 @@ export default class GameStage extends Phaser.Scene {
     this.setupSockets();
 
     // Get variables ready
-    this.registry.set('monkeeGroup', this.add.group());
+    this.registry.set('chaserGroup', this.add.group());
     this.registry.set('runnerGroup', this.add.group());
     this.cursors = this.registry.get('cursors');
 
     // Handle overlap tag
-    this.physics.add.overlap(this.registry.get('runnerGroup'), this.registry.get('monkeeGroup'), (player1, player2) => {
-      if (player1.character !== 'monkee') this.registry.get('runnerGroup').remove(player1);
-      if (player2.character !== 'monkee') this.registry.get('runnerGroup').remove(player2);
-      if (this.data.get('playerSprite').character !== 'monkee') {
+    this.physics.add.overlap(this.registry.get('runnerGroup'), this.registry.get('chaserGroup'), (player1, player2) => {
+      if (!player1.isChaser) this.registry.get('runnerGroup').remove(player1);
+      if (!player2.isChaser) this.registry.get('runnerGroup').remove(player2);
+      if (!this.data.get('playerSprite').isChaser) {
         this.registry.get('socket').emit('client_tagged');
       }
     });
 
     // Create player
     const playerData = this.registry.get('playerData');
-    this.data.set('playerSprite', this.createPlayer(playerData.position.x, playerData.position.y, playerData.character));
+    this.data.set('playerSprite', this.createPlayer(playerData.position.x, playerData.position.y, playerData.character, playerData.isChaser));
 
     // Create other players
     const iterator = this.registry.get('gameRoomOccupants').entries();
     const otherPlayers = new Map();
     let iteratorData = iterator.next();
     while (!iteratorData.done) {
-      const { position, character } = iteratorData.value[1];
-      otherPlayers.set(iteratorData.value[0], this.createPlayer(position.x, position.y, character));
+      const { position, character, isChaser } = iteratorData.value[1];
+      otherPlayers.set(iteratorData.value[0], this.createPlayer(position.x, position.y, character, isChaser));
       iteratorData = iterator.next();
     }
     this.data.set('otherPlayers', otherPlayers);
@@ -160,18 +167,25 @@ export default class GameStage extends Phaser.Scene {
     }
   }
 
-  createPlayer(positionX, positionY, character) {
+  createPlayer(positionX, positionY, character, isChaser) {
     const tempPlayerSprite = this.physics.add.sprite(positionX, positionY, `${character}-idle`);
 
     // Character data
     tempPlayerSprite.anims.play(`${character}-idle`, true);
     tempPlayerSprite.id = this.registry.get('socketId');
     tempPlayerSprite.character = character;
-    this.registry.get((character === 'monkee') ? 'monkeeGroup' : 'runnerGroup').add(tempPlayerSprite);
+    tempPlayerSprite.isChaser = isChaser;
+    this.registry.get((isChaser) ? 'chaserGroup' : 'runnerGroup').add(tempPlayerSprite);
 
     // Character appearance
-    tempPlayerSprite.setSize(14, 27);
-    tempPlayerSprite.setOffset(8, 5);
+    if(tempPlayerSprite.character === 'piggee') {
+      tempPlayerSprite.setScale(1.7);
+      tempPlayerSprite.setSize(14, 13);
+      tempPlayerSprite.setOffset(9, 14);
+    } else {
+      tempPlayerSprite.setSize(14, 27);
+      tempPlayerSprite.setOffset(8, 5);
+    }
 
     // Character physics
     tempPlayerSprite.setCollideWorldBounds(true);

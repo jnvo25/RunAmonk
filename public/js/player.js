@@ -3,6 +3,7 @@ module.exports = class Player {
     this.character = undefined;
     this.isReady = false;
     this.isTagged = false;
+    this.isChaser = false;
     this.position = undefined;
     this.specialMoveCooldown = undefined;
   }
@@ -11,6 +12,7 @@ module.exports = class Player {
     this.character = undefined;
     this.isReady = false;
     this.isTagged = false;
+    this.isChaser = false;
     this.position = undefined;
     this.specialMoveCooldown = undefined;
   }

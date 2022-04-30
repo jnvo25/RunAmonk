@@ -49,10 +49,10 @@ module.exports = class Game {
       iteratorResult = iterator.next();
     }
 
-    // Select random player to be monkee
+    // Select random player to be chaser
     const playerIds = Array.from(this.players.get(GAME_ROOMS.GAME).keys());
-    this.getPlayer(playerIds[Math.floor(Math.random() * playerIds.length)], GAME_ROOMS.GAME).character = 'monkee';
-
+    const randomPlayerId = playerIds[Math.floor(Math.random() * playerIds.length)];
+    this.setPlayerChaser(randomPlayerId);
     // Start timer
     this.startTime = Date.now();
 
@@ -60,6 +60,13 @@ module.exports = class Game {
     this.gameTimer = setTimeout(() => {
       this.gameOverCallback();
     }, GAME_DURATION);
+  }
+
+  setPlayerChaser(socketId) {
+    Game.verifyValidSocketId(socketId);
+
+    this.getPlayer(socketId, GAME_ROOMS.GAME).isChaser = true;
+    this.getPlayer(socketId, GAME_ROOMS.GAME).character = 'piggee';
   }
 
   getPlayerRoom(socketId) {
@@ -137,7 +144,7 @@ module.exports = class Game {
     const iterator = this.players.get(GAME_ROOMS.GAME).values();
     let iteratorResult = iterator.next();
     while (!iteratorResult.done) {
-      if (!iteratorResult.value.isTagged && iteratorResult.value.character !== 'monkee') {
+      if (!iteratorResult.value.isTagged && !iteratorResult.value.isChaser) {
         return;
       }
       iteratorResult = iterator.next();

@@ -12,9 +12,11 @@ describe('Player Class', () => {
     tempPlayer.character = 'monkee';
     tempPlayer.isReady = true;
     tempPlayer.isTagged = true;
+    tempPlayer.isChaser = true;
     tempPlayer.reset();
     expect(tempPlayer.character === 'undefined');
     expect(tempPlayer.isReady === false);
     expect(tempPlayer.isTagged === false);
+    expect(tempPlayer.isChaser).toBeFalsy();
   });
 });
