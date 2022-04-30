@@ -11,6 +11,8 @@ function getFutureDate(seconds) {
   return t;
 }
 
+jest.useFakeTimers();
+
 describe('Game Class', () => {
   test('create instance', () => {
     // eslint-disable-next-line no-unused-vars
@@ -72,35 +74,31 @@ describe('Game Class', () => {
     tempGame.addPlayer('jki9okpi0ijuhyg6trfd');
     tempGame.updateReadyPlayer('jki9okpi0ijuhyg6trfd');
     tempGame.updateReadyPlayer('g6yhft5r4dswerdtguji');
-    tempGame.startGame();
+    tempGame.startGame(() => {});
     expect(tempGame.getPlayerRoom('jki9okpi0ijuhyg6trfd')).toEqual('game');
     expect(tempGame.getPlayerRoom('g6yhft5r4dswerdtguji')).toEqual('game');
     expect(tempGame.getPlayer('jki9okpi0ijuhyg6trfd').position).toHaveProperty('x');
     expect(tempGame.getPlayer('jki9okpi0ijuhyg6trfd').position).toHaveProperty('y');
     expect(tempGame.getPlayer('g6yhft5r4dswerdtguji').position).toHaveProperty('x');
     expect(tempGame.getPlayer('g6yhft5r4dswerdtguji').position).toHaveProperty('y');
+    jest.runAllTimers();
   });
 
-  test('start game, wait 100 seconds, check if game ended', () => {
+  test('start game, wait, check if game ended, start pregame', () => {
+    jest.useFakeTimers();
     const tempGame = new Game();
-    tempGame.addPlayer('g6yhft5r4dswerdtguji');
+    let gameoverFlag = false;
     tempGame.addPlayer('jki9okpi0ijuhyg6trfd');
+    tempGame.addPlayer('g6yhft5r4dswerdtguji');
     tempGame.updateReadyPlayer('jki9okpi0ijuhyg6trfd');
     tempGame.updateReadyPlayer('g6yhft5r4dswerdtguji');
-    tempGame.startGame();
-    expect(tempGame.isGameOver()).toBeFalsy();
-    jest.useFakeTimers().setSystemTime(getFutureDate(100));
-    expect(tempGame.isGameOver()).toBeTruthy();
-  });
+    tempGame.startGame(() => {
+      gameoverFlag = true;
+    });
+    expect(gameoverFlag).toBeFalsy();
+    jest.runAllTimers();
+    expect(gameoverFlag).toBeTruthy();
 
-  test('startPregame resets game variables', () => {
-    const tempGame = new Game();
-    tempGame.addPlayer('g6yhft5r4dswerdtguji');
-    tempGame.addPlayer('jki9okpi0ijuhyg6trfd');
-    tempGame.updateReadyPlayer('jki9okpi0ijuhyg6trfd');
-    tempGame.updateReadyPlayer('g6yhft5r4dswerdtguji');
-    tempGame.startGame();
-    jest.useFakeTimers().setSystemTime(getFutureDate(100));
     tempGame.startPregame();
 
     // Both players should be in pregame stage and not ready
@@ -118,14 +116,14 @@ describe('Game Class', () => {
 
   test('gameStatus correctly reflect game status', () => {
     const tempGame = new Game();
-    tempGame.addPlayer('g6yhft5r4dswerdtguji');
     tempGame.addPlayer('jki9okpi0ijuhyg6trfd');
+    tempGame.addPlayer('g6yhft5r4dswerdtguji');
     tempGame.updateReadyPlayer('jki9okpi0ijuhyg6trfd');
     tempGame.updateReadyPlayer('g6yhft5r4dswerdtguji');
     expect(tempGame.gameStatus).toBe(GAME_STATUS.IDLE);
-    tempGame.startGame();
+    tempGame.startGame(() => {});
     expect(tempGame.gameStatus).toBe(GAME_STATUS.PLAYING);
-    jest.useFakeTimers().setSystemTime(getFutureDate(100));
+    jest.runAllTimers();
     expect(tempGame.gameStatus).toBe(GAME_STATUS.IDLE);
     tempGame.startPregame();
     expect(tempGame.gameStatus).toBe(GAME_STATUS.IDLE);
@@ -137,7 +135,7 @@ describe('Game Class', () => {
     tempGame.addPlayer('jki9okpi0ijuhyg6trfd');
     tempGame.updateReadyPlayer('jki9okpi0ijuhyg6trfd');
     tempGame.updateReadyPlayer('g6yhft5r4dswerdtguji');
-    tempGame.startGame();
+    tempGame.startGame(() => {});
 
     tempGame.addPlayer('0kjhytfds4yu7y6fdsaw');
     expect(tempGame.getPlayerRoom('0kjhytfds4yu7y6fdsaw')).toBe('waiting');
@@ -149,7 +147,7 @@ describe('Game Class', () => {
     tempGame.addPlayer('jki9okpi0ijuhyg6trfd');
     tempGame.updateReadyPlayer('jki9okpi0ijuhyg6trfd');
     tempGame.updateReadyPlayer('g6yhft5r4dswerdtguji');
-    tempGame.startGame();
+    tempGame.startGame(() => {});
 
     expect(tempGame.getPlayer('jki9okpi0ijuhyg6trfd').character).toBeDefined();
     expect(tempGame.getPlayer('g6yhft5r4dswerdtguji').character).toBeDefined();
@@ -165,13 +163,12 @@ describe('Game Class', () => {
     tempGame.updateReadyPlayer('g6yhft5r4dswerdtguji');
     tempGame.updateReadyPlayer('jki9okpi0ijuhyg6trfe');
     tempGame.updateReadyPlayer('g6yhft5r4dswerdtgujf');
-    tempGame.startGame();
+    tempGame.startGame(() => {});
 
     const iterator = tempGame.players.get('game').values();
     let value = iterator.next();
     let monkeeFound = false;
     while (!value.done || !monkeeFound) {
-      console.log(value.value.character);
       if (value.value.character === 'monkee') monkeeFound = true;
       value = iterator.next();
     }
@@ -180,14 +177,17 @@ describe('Game Class', () => {
 
   test('Game over when all players tagged', () => {
     const tempGame = new Game();
+    let gameoverFlag = false;
     tempGame.addPlayer('g6yhft5r4dswerdtguji');
     tempGame.addPlayer('jki9okpi0ijuhyg6trfd');
     tempGame.updateReadyPlayer('jki9okpi0ijuhyg6trfd');
     tempGame.updateReadyPlayer('g6yhft5r4dswerdtguji');
-    tempGame.startGame();
-    expect(tempGame.isGameOver()).toBeFalsy();
-    tempGame.getPlayer('jki9okpi0ijuhyg6trfd').isTagged = true;
-    tempGame.getPlayer('g6yhft5r4dswerdtguji').isTagged = true;
-    expect(tempGame.isGameOver()).toBeTruthy();
+    tempGame.startGame(() => {
+      gameoverFlag = true;
+    });
+    expect(gameoverFlag).toBeFalsy();
+    tempGame.updatePlayerTagged('jki9okpi0ijuhyg6trfd');
+    tempGame.updatePlayerTagged('g6yhft5r4dswerdtguji');
+    expect(gameoverFlag).toBeTruthy();
   });
 });

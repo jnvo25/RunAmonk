@@ -29,6 +29,8 @@ io.on('connection', (socket) => {
   socket.emit('welcome', {
     socketId: socket.id,
     playerRoom: Game.addPlayer(socket.id),
+
+    // Send start time and duration if game is in progress
     ...(Game.gameStatus === GAME_STATUS.PLAYING && {
       startTime: Game.startTime,
       gameDuration: Game.gameDuration,
@@ -37,16 +39,19 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     Game.deletePlayer(socket.id);
+
+    // TODO: Emit to users that player has disconnected
   });
 
   socket.on('client_playerReady', () => {
     Game.updateReadyPlayer(socket.id);
     if (Game.readyToStart) {
-      Game.startGame();
-      timeout = setTimeout(() => {
-        io.emit('server_gameOver');
-        Game.startPregame();
-      }, Game.gameDuration);
+      Game.startGame(() => {
+        setTimeout(() => {
+          io.emit('server_gameOver');
+          Game.startPregame();
+        }, 2000);
+      });
       io.emit('server_gameStarted', {
         players: Array.from(Game.players.get('game').entries()),
         startTime: Game.startTime,
@@ -79,12 +84,5 @@ io.on('connection', (socket) => {
   socket.on('client_tagged', () => {
     Game.updatePlayerTagged(socket.id);
     io.emit('server_tagUpdate', socket.id);
-    if (Game.isGameOver()) {
-      clearTimeout(timeout);
-      setTimeout(() => {
-        io.emit('server_gameOver');
-        Game.startPregame();
-      }, 2000);
-    }
   });
 });

@@ -20,9 +20,15 @@ module.exports = class Game {
     return roomToPlace;
   }
 
-  startGame() {
+  startGame(externalGameOverCallback) {
     if (!this.readyToStart) throw new Error('Game is not ready to start');
     if (this.startTime !== undefined) throw new Error('Error starting game, start time exists');
+    if (externalGameOverCallback === undefined) throw new Error('Game over callback not provided');
+
+    // Register gameover callback
+    this.gameOverCallback = () => {
+      externalGameOverCallback();
+    };
 
     // Move all players from pregame to game state and assign coordinate
     const iterator = this.players.get(GAME_ROOMS.PREGAME).keys();
@@ -30,6 +36,7 @@ module.exports = class Game {
     const freeCoordinates = [...SPAWN_COORDS];
     while (!iteratorResult.done) {
       this.movePlayer(iteratorResult.value, GAME_ROOMS.GAME);
+      if (freeCoordinates.length <= 0) throw new Error('Ran out of coordinates for spawn');
       const randomCoordinate = freeCoordinates.pop();
       this.updatePlayerPosition(iteratorResult.value, randomCoordinate);
       this.updatePlayerCharacter(
@@ -45,18 +52,11 @@ module.exports = class Game {
 
     // Start timer
     this.startTime = Date.now();
-  }
 
-  isGameOver() {
-    if (this.startTime === undefined) throw new Error('Game has not started yet');
-
-    const iterator = this.players.get(GAME_ROOMS.GAME).values();
-    let iteratorResult = iterator.next();
-    while (!iteratorResult.done) {
-      if (!iteratorResult.value.isTagged && iteratorResult.value.character !== 'monkee') return false;
-      iteratorResult = iterator.next();
-    }
-    return true;
+    // Start timer
+    this.gameTimer = setTimeout(() => {
+      this.gameOverCallback();
+    }, GAME_DURATION);
   }
 
   getPlayerRoom(socketId) {
@@ -94,7 +94,13 @@ module.exports = class Game {
 
   deletePlayer(socketId) {
     Game.verifyValidSocketId(socketId);
+
     this.players.get(this.getPlayerRoom(socketId)).delete(socketId);
+
+    // Check if game over
+    if (this.gameStatus === GAME_STATUS.PLAYING && this.players.get(GAME_ROOMS.GAME).size < 2) {
+      this.gameOverCallback();
+    }
   }
 
   movePlayer(socketId, room) {
@@ -112,8 +118,18 @@ module.exports = class Game {
 
   updatePlayerTagged(socketId) {
     Game.verifyValidSocketId(socketId);
-
     this.getPlayer(socketId, GAME_ROOMS.GAME).isTagged = true;
+
+    // Check gameover if all players have been tagged
+    const iterator = this.players.get(GAME_ROOMS.GAME).values();
+    let iteratorResult = iterator.next();
+    while (!iteratorResult.done) {
+      if (!iteratorResult.value.isTagged && iteratorResult.value.character !== 'monkee') {
+        return;
+      }
+      iteratorResult = iterator.next();
+    }
+    this.gameOverCallback();
   }
 
   updatePlayerPosition(socketId, { x, y }) {
