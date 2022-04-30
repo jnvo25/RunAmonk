@@ -27,9 +27,10 @@ module.exports = class Game {
     // Move all players from pregame to game state and assign coordinate
     const iterator = this.players.get(GAME_ROOMS.PREGAME).keys();
     let iteratorResult = iterator.next();
+    const freeCoordinates = [...SPAWN_COORDS];
     while (!iteratorResult.done) {
       this.movePlayer(iteratorResult.value, GAME_ROOMS.GAME);
-      const randomCoordinate = SPAWN_COORDS[Math.floor(Math.random() * SPAWN_COORDS.length)];
+      const randomCoordinate = freeCoordinates.pop();
       this.updatePlayerPosition(iteratorResult.value, randomCoordinate);
       this.updatePlayerCharacter(
         iteratorResult.value,
@@ -66,11 +67,21 @@ module.exports = class Game {
     throw new Error(`Unable to find player with socketId: ${socketId}`);
   }
 
+  isPlayerTagged(socketId) {
+    Game.verifyValidSocketId(socketId);
+
+    return this.getPlayer(socketId, GAME_ROOMS.GAME).isTagged;
+  }
+
   getPlayerPosition(socketId) {
+    Game.verifyValidSocketId(socketId);
+
     return this.getPlayer(socketId, GAME_ROOMS.GAME).position;
   }
 
   getPlayer(socketId, roomName = undefined) {
+    Game.verifyValidSocketId(socketId);
+
     if (roomName) return this.players.get(roomName).get(socketId);
     return this.players.get(this.getPlayerRoom(socketId)).get(socketId);
   }
@@ -170,10 +181,10 @@ module.exports = class Game {
   }
 
   static verifyValidSocketId(socketId) {
-    if (socketId.length !== 20) throw new Error(`Invalid socket id: ${socketId}`);
+    if (socketId === undefined || socketId.length !== 20) throw new Error(`Invalid socket id: ${socketId}`);
   }
 
   static verifyValidRoom(room) {
-    if (!Object.values(GAME_ROOMS).includes(room)) throw new Error(`Invalid room: ${room}`);
+    if (room === undefined || !Object.values(GAME_ROOMS).includes(room)) throw new Error(`Invalid room: ${room}`);
   }
 };

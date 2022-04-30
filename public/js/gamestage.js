@@ -181,12 +181,10 @@ export default class GameStage extends Phaser.Scene {
 
     this.socket.on('server_tagUpdate', (socketId) => {
       if (socketId === this.registry.get('socketId')) {
-        console.log('Player tagged');
         this.data.get('playerSprite').isTagged = true;
         this.data.get('playerSprite').anims.play(`${this.data.get('playerSprite').character}-death`);
         this.data.get('playerSprite').setVelocity(0, 0);
       } else {
-        console.log('Other player tagged');
         const taggedPlayer = this.data.get('otherPlayers').get(socketId);
         taggedPlayer.anims.play(`${taggedPlayer.character}-death`);
         taggedPlayer.setVelocity(0, 0);

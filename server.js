@@ -64,13 +64,15 @@ io.on('connection', (socket) => {
   socket.on('client_movementUpdate', ({
     velX, velY, flip, anim,
   }) => {
-    socket.broadcast.emit('server_movementUpdate', {
-      velX, velY, flip, anim, socketId: socket.id,
-    });
+    if (!Game.isPlayerTagged(socket.id)) {
+      socket.broadcast.emit('server_movementUpdate', {
+        velX, velY, flip, anim, socketId: socket.id,
+      });
+    }
   });
 
   socket.on('client_positionUpdate', ({ x, y }) => {
-    socket.broadcast.emit('server_positionUpdate', { x, y, socketId: socket.id });
+    if (!Game.isPlayerTagged(socket.id)) socket.broadcast.emit('server_positionUpdate', { x, y, socketId: socket.id });
   });
 
   socket.on('client_tagged', () => {
