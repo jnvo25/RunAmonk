@@ -12,10 +12,13 @@ const GAME_ROOMS = {
 };
 
 const SPAWN_COORDS = [
-  { x: 400, y: 400 },
-  { x: 700, y: 300 },
-  { x: 650, y: 300 },
+  { x: 96, y: 304 },
+  { x: 704, y: 304 },
+  { x: 400, y: 80 },
   { x: 100, y: 300 },
+  { x: 400, y: 432 },
+  { x: 720, y: 432 },
+  { x: 64, y: 432 },
 ];
 
 const CHARACTERS = ['pinkie', 'owlet'];

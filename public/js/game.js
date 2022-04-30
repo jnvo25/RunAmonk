@@ -1,3 +1,4 @@
+const { getRandomInt } = require('./helpers');
 const Player = require('./player');
 const {
   GAME_STATUS, GAME_DURATION, GAME_ROOMS, SPAWN_COORDS, CHARACTERS,
@@ -38,7 +39,8 @@ module.exports = class Game {
     while (!iteratorResult.done) {
       this.movePlayer(iteratorResult.value, GAME_ROOMS.GAME);
       if (freeCoordinates.length <= 0) throw new Error('Ran out of coordinates for spawn');
-      const randomCoordinate = freeCoordinates.pop();
+      const randomIndex = getRandomInt(freeCoordinates.length);
+      const randomCoordinate = freeCoordinates.splice(randomIndex, 1)[0];
       this.updatePlayerPosition(iteratorResult.value, randomCoordinate);
       this.updatePlayerCharacter(
         iteratorResult.value,
@@ -115,6 +117,16 @@ module.exports = class Game {
     // Copy to new and delete original
     this.players.get(room).set(socketId, tempPlayer);
     this.players.get(playerState).delete(socketId);
+  }
+
+  activatePlayerSpecialMove(socketId) {
+    Game.verifyValidSocketId(socketId);
+    const playerSpecialMoveCooldown = this.getPlayer(socketId, GAME_ROOMS.GAME).specialMoveCooldown;
+    if (Date.now() - playerSpecialMoveCooldown >= 5000 || playerSpecialMoveCooldown === undefined) {
+      this.getPlayer(socketId, GAME_ROOMS.GAME).specialMoveCooldown = Date.now();
+      return true;
+    }
+    return false;
   }
 
   updatePlayerTagged(socketId) {

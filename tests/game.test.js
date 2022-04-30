@@ -5,6 +5,12 @@ import {
 import { GAME_STATUS } from '../public/js/config';
 import Game from '../public/js/game';
 
+function getFutureDate(seconds) {
+  const t = new Date();
+  t.setSeconds(t.getSeconds() + seconds);
+  return t;
+}
+
 jest.useFakeTimers();
 
 describe('Game Class', () => {
@@ -183,5 +189,18 @@ describe('Game Class', () => {
     tempGame.updatePlayerTagged('jki9okpi0ijuhyg6trfd');
     tempGame.updatePlayerTagged('g6yhft5r4dswerdtguji');
     expect(gameoverFlag).toBeTruthy();
+  });
+
+  test('Ensure special moves cooldown', () => {
+    const tempGame = new Game();
+    tempGame.addPlayer('g6yhft5r4dswerdtguji');
+    tempGame.addPlayer('jki9okpi0ijuhyg6trfd');
+    tempGame.updateReadyPlayer('jki9okpi0ijuhyg6trfd');
+    tempGame.updateReadyPlayer('g6yhft5r4dswerdtguji');
+    tempGame.startGame(() => {});
+    expect(tempGame.activatePlayerSpecialMove('g6yhft5r4dswerdtguji')).toBeTruthy();
+    expect(tempGame.activatePlayerSpecialMove('g6yhft5r4dswerdtguji')).toBeFalsy();
+    jest.setSystemTime(getFutureDate(5000));
+    expect(tempGame.activatePlayerSpecialMove('g6yhft5r4dswerdtguji')).toBeTruthy();
   });
 });

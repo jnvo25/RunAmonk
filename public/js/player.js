@@ -4,6 +4,7 @@ module.exports = class Player {
     this.isReady = false;
     this.isTagged = false;
     this.position = undefined;
+    this.specialMoveCooldown = undefined;
   }
 
   reset() {
@@ -11,5 +12,6 @@ module.exports = class Player {
     this.isReady = false;
     this.isTagged = false;
     this.position = undefined;
+    this.specialMoveCooldown = undefined;
   }
 };

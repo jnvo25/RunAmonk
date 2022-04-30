@@ -76,6 +76,10 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('client_specialMove', () => {
+    if (Game.activatePlayerSpecialMove(socket.id)) io.emit('server_specialMoveGranted', { socketId: socket.id });
+  });
+
   socket.on('client_positionUpdate', ({ x, y }) => {
     if (!Game.isPlayerTagged(socket.id)) socket.broadcast.emit('server_positionUpdate', { x, y, socketId: socket.id });
   });
