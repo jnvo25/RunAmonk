@@ -1,8 +1,8 @@
+const { getRandomInt } = require('./helpers');
 const Player = require('./player');
 const {
   GAME_STATUS, GAME_DURATION, GAME_ROOMS, SPAWN_COORDS, CHARACTERS,
 } = require('./config');
-const { getRandomInt } = require('./helpers');
 
 module.exports = class Game {
   constructor() {
@@ -117,6 +117,16 @@ module.exports = class Game {
     // Copy to new and delete original
     this.players.get(room).set(socketId, tempPlayer);
     this.players.get(playerState).delete(socketId);
+  }
+
+  activatePlayerSpecialMove(socketId) {
+    Game.verifyValidSocketId(socketId);
+    const playerSpecialMoveCooldown = this.getPlayer(socketId, GAME_ROOMS.GAME).specialMoveCooldown;
+    if (Date.now() - playerSpecialMoveCooldown >= 5000 || playerSpecialMoveCooldown === undefined) {
+      this.getPlayer(socketId, GAME_ROOMS.GAME).specialMoveCooldown = Date.now();
+      return true;
+    }
+    return false;
   }
 
   updatePlayerTagged(socketId) {

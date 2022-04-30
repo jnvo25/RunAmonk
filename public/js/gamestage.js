@@ -1,7 +1,6 @@
-// eslint-disable-next-line import/extensions
-import helpers from './helpers.js';
-
-const { getTime } = helpers;
+function getTime(startTime, gameDuration) {
+  return Math.floor((gameDuration / 1000) - (Date.now() - startTime) / 1000);
+}
 
 // eslint-disable-next-line no-undef
 export default class GameStage extends Phaser.Scene {
@@ -112,6 +111,9 @@ export default class GameStage extends Phaser.Scene {
 
   readPlayerInput() {
     const playerSprite = this.data.get('playerSprite');
+    if (this.registry.get('spacebar').isDown) {
+      this.registry.get('socket').emit('client_specialMove');
+    }
     if (this.data.get('playerSprite').isTagged) return;
 
     if (this.cursors.up.isDown) {
@@ -206,6 +208,39 @@ export default class GameStage extends Phaser.Scene {
         taggedPlayer.anims.play(`${taggedPlayer.character}-death`);
         taggedPlayer.setVelocity(0, 0);
       }
+    });
+
+    this.socket.on('server_specialMoveGranted', ({ socketId }) => {
+      const playerSprite = socketId === this.registry.get('socketId')
+        ? this.data.get('playerSprite')
+        : this.data.get('otherPlayers').get(socketId);
+
+      const playerData = {
+        x: playerSprite.x,
+        y: playerSprite.y,
+        velX: playerSprite.body.velocity.x,
+        velY: playerSprite.body.velocity.y,
+        character: playerSprite.character,
+      };
+      const decoySprite = this.physics.add.sprite(playerData.x, playerData.y, `${playerData.character}-run`);
+
+      // Character data
+      decoySprite.anims.play(`${playerData.character}-run`, true);
+
+      // Character appearance
+      decoySprite.setSize(14, 27);
+      decoySprite.setOffset(8, 5);
+
+      // Character physics
+      decoySprite.setCollideWorldBounds(true);
+      this.physics.add.collider(decoySprite, this.platforms);
+
+      decoySprite.setVelocityX(playerData.velX === 0 ? 160 * (playerSprite.flipX ? 1 : -1): -playerData.velX);
+      decoySprite.setFlipX(decoySprite.body.velocity.x < 0);
+      setTimeout(() => {
+        decoySprite.anims.play(`${playerData.character}-death`);
+        this.grunt.play();
+      }, 3000);
     });
   }
 
