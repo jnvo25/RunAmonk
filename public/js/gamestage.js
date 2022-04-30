@@ -17,6 +17,9 @@ export default class GameStage extends Phaser.Scene {
     // Load  Piggee assets
     this.load.spritesheet('piggee-idle', 'assets/Piggee_Monster/Piggee_Monster_Idle_11.png', { frameWidth: 34, frameHeight: 28 });
     this.load.spritesheet('piggee-run', 'assets/Piggee_Monster/Piggee_Monster_Run_6.png', { frameWidth: 34, frameHeight: 28 });
+    this.load.spritesheet('piggee-special-idle', 'assets/Piggee_Monster/Piggee_Monster_Special_Idle_9.png', { frameWidth: 26, frameHeight: 30 });
+    this.load.spritesheet('piggee-special-run', 'assets/Piggee_Monster/Piggee_Monster_Special_Run_6.png', { frameWidth: 26, frameHeight: 30 });
+    this.load.image('piggee-box', 'assets/Piggee_Monster/Piggee_Monster_Box.png');
 
     // Load Pinkie assets
     this.load.spritesheet('pinkie-idle', 'assets/Pink_Monster/Pink_Monster_Idle_4.png', { frameWidth: 32, frameHeight: 32 });
@@ -65,6 +68,8 @@ export default class GameStage extends Phaser.Scene {
 
     this.createAnimation('piggee-idle', 10, true);
     this.createAnimation('piggee-run', 5, true);
+    this.createAnimation('piggee-special-idle', 8, true);
+    this.createAnimation('piggee-special-run', 5, true);
 
     // Create sounds
     this.jump = this.sound.add('jump', { volume: 0.3, detune: 400 });
@@ -230,21 +235,32 @@ export default class GameStage extends Phaser.Scene {
         : this.data.get('otherPlayers').get(socketId);
 
       // Set invisible for other players
-      if (socketId !== this.registry.get('socketId')) {
-        playerSprite.setAlpha(0);
+      if (playerSprite.character === 'piggee') {
+        playerSprite.character = 'piggee-special';
+      } else if (playerSprite.character === 'piggee-special') {
+        playerSprite.character = 'piggee';
+        this.generateBoxThrow(
+          playerSprite.x,
+          playerSprite.y,
+          playerSprite.flipX,
+        );
       } else {
-        playerSprite.setAlpha(0.3);
+        if (socketId !== this.registry.get('socketId')) {
+          playerSprite.setAlpha(0);
+        } else {
+          playerSprite.setAlpha(0.3);
+        }
+        // Make player visible after 1 second
+        setTimeout(() => {
+          playerSprite.setAlpha(1);
+        }, 1000);
+        this.generateDecoy(
+          playerSprite.x,
+          playerSprite.y,
+          playerSprite.flipX,
+          playerSprite.character,
+        );
       }
-      // Make player visible after 1 second
-      setTimeout(() => {
-        playerSprite.setAlpha(1);
-      }, 1000);
-      this.generateDecoy(
-        playerSprite.x,
-        playerSprite.y,
-        playerSprite.flipX,
-        playerSprite.character,
-      );
     });
   }
 
@@ -268,6 +284,23 @@ export default class GameStage extends Phaser.Scene {
       decoySprite.anims.play(`${character}-death`);
       this.grunt.play();
     }, 3000);
+  }
+
+  generateBoxThrow(x, y, flip) {
+    const decoySprite = this.physics.add.sprite(x, y, 'piggee-box');
+
+    // Character appearance
+    decoySprite.setSize(17, 14);
+    decoySprite.setOffset(2, 0);
+    decoySprite.setScale(1.7);
+
+    // Character physics
+    decoySprite.setCollideWorldBounds(true);
+    this.physics.add.collider(decoySprite, this.platforms);
+
+    decoySprite.setVelocityX(250 * (flip ? -1 : 1));
+    decoySprite.setVelocityY(-300);
+    decoySprite.setFlipX(decoySprite.body.velocity.x < 0);
   }
 
   // Add animation to phaser
