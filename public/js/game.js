@@ -27,6 +27,7 @@ module.exports = class Game {
 
     // Register gameover callback
     this.gameOverCallback = () => {
+      clearTimeout(this.gameTimer);
       externalGameOverCallback();
     };
 
