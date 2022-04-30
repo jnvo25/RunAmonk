@@ -27,6 +27,7 @@ module.exports = class Game {
 
     // Register gameover callback
     this.gameOverCallback = () => {
+      clearTimeout(this.gameTimer);
       externalGameOverCallback();
     };
 
@@ -37,7 +38,8 @@ module.exports = class Game {
     while (!iteratorResult.done) {
       this.movePlayer(iteratorResult.value, GAME_ROOMS.GAME);
       if (freeCoordinates.length <= 0) throw new Error('Ran out of coordinates for spawn');
-      const randomCoordinate = freeCoordinates.pop();
+      const randomIndex = Math.floor(Math.random() * freeCoordinates.length);
+      const randomCoordinate = freeCoordinates.splice(randomIndex, 1)[0];
       this.updatePlayerPosition(iteratorResult.value, randomCoordinate);
       this.updatePlayerCharacter(
         iteratorResult.value,
