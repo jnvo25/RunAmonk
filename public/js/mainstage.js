@@ -63,6 +63,7 @@ export default class MainStage extends Phaser.Scene {
     });
 
     this.socket.on('server_gameOver', () => {
+      this.game.sound.stopAll();
       this.launchScene(SCENES.PostgameStage);
     });
   }
