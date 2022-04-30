@@ -2,6 +2,7 @@ const Player = require('./player');
 const {
   GAME_STATUS, GAME_DURATION, GAME_ROOMS, SPAWN_COORDS, CHARACTERS,
 } = require('./config');
+const { getRandomInt } = require('./helpers');
 
 module.exports = class Game {
   constructor() {
@@ -38,7 +39,7 @@ module.exports = class Game {
     while (!iteratorResult.done) {
       this.movePlayer(iteratorResult.value, GAME_ROOMS.GAME);
       if (freeCoordinates.length <= 0) throw new Error('Ran out of coordinates for spawn');
-      const randomIndex = Math.floor(Math.random() * freeCoordinates.length);
+      const randomIndex = getRandomInt(freeCoordinates.length);
       const randomCoordinate = freeCoordinates.splice(randomIndex, 1)[0];
       this.updatePlayerPosition(iteratorResult.value, randomCoordinate);
       this.updatePlayerCharacter(
