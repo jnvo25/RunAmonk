@@ -158,4 +158,27 @@ describe('Game Class', () => {
     expect(tempGame.getPlayer('jki9okpi0ijuhyg6trfd').character).toBeDefined();
     expect(tempGame.getPlayer('g6yhft5r4dswerdtguji').character).toBeDefined();
   });
+
+  test('Ensure at least one player is monkee', () => {
+    const tempGame = new Game();
+    tempGame.addPlayer('g6yhft5r4dswerdtguji');
+    tempGame.addPlayer('jki9okpi0ijuhyg6trfd');
+    tempGame.addPlayer('g6yhft5r4dswerdtgujf');
+    tempGame.addPlayer('jki9okpi0ijuhyg6trfe');
+    tempGame.updateReadyPlayer('jki9okpi0ijuhyg6trfd');
+    tempGame.updateReadyPlayer('g6yhft5r4dswerdtguji');
+    tempGame.updateReadyPlayer('jki9okpi0ijuhyg6trfe');
+    tempGame.updateReadyPlayer('g6yhft5r4dswerdtgujf');
+    tempGame.startGame();
+
+    const iterator = tempGame.players.get('game').values();
+    let value = iterator.next();
+    let monkeeFound = false;
+    while (!value.done || !monkeeFound) {
+      console.log(value.value.character);
+      if (value.value.character === 'monkee') monkeeFound = true;
+      value = iterator.next();
+    }
+    expect(monkeeFound).toBeTruthy();
+  });
 });

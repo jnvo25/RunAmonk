@@ -38,6 +38,10 @@ module.exports = class Game {
       iteratorResult = iterator.next();
     }
 
+    // Select random player to be monkee
+    const playerIds = Array.from(this.players.get(GAME_ROOMS.GAME).keys());
+    this.getPlayer(playerIds[Math.floor(Math.random() * playerIds.length)], GAME_ROOMS.GAME).character = 'monkee';
+
     // Start timer
     this.startTime = Date.now();
   }
