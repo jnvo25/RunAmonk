@@ -22,6 +22,7 @@ server.listen(process.env.PORT || 8080, () => { // Uses port set by heroku
 const GameObject = require('./public/js/game');
 
 const Game = new GameObject();
+let timeout;
 
 // Handle connections
 io.on('connection', (socket) => {
@@ -42,7 +43,7 @@ io.on('connection', (socket) => {
     Game.updateReadyPlayer(socket.id);
     if (Game.readyToStart) {
       Game.startGame();
-      setTimeout(() => {
+      timeout = setTimeout(() => {
         io.emit('server_gameOver');
         Game.startPregame();
       }, Game.gameDuration);
@@ -78,5 +79,12 @@ io.on('connection', (socket) => {
   socket.on('client_tagged', () => {
     Game.updatePlayerTagged(socket.id);
     io.emit('server_tagUpdate', socket.id);
+    if (Game.isGameOver()) {
+      clearTimeout(timeout);
+      setTimeout(() => {
+        io.emit('server_gameOver');
+        Game.startPregame();
+      }, 2000);
+    }
   });
 });

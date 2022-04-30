@@ -143,10 +143,6 @@ describe('Game Class', () => {
     expect(tempGame.getPlayerRoom('0kjhytfds4yu7y6fdsaw')).toBe('waiting');
   });
 
-  test('Players generated with unique coordinates', () => {
-    // TODO:
-  });
-
   test('Players generated with random characters', () => {
     const tempGame = new Game();
     tempGame.addPlayer('g6yhft5r4dswerdtguji');
@@ -180,5 +176,18 @@ describe('Game Class', () => {
       value = iterator.next();
     }
     expect(monkeeFound).toBeTruthy();
+  });
+
+  test('Game over when all players tagged', () => {
+    const tempGame = new Game();
+    tempGame.addPlayer('g6yhft5r4dswerdtguji');
+    tempGame.addPlayer('jki9okpi0ijuhyg6trfd');
+    tempGame.updateReadyPlayer('jki9okpi0ijuhyg6trfd');
+    tempGame.updateReadyPlayer('g6yhft5r4dswerdtguji');
+    tempGame.startGame();
+    expect(tempGame.isGameOver()).toBeFalsy();
+    tempGame.getPlayer('jki9okpi0ijuhyg6trfd').isTagged = true;
+    tempGame.getPlayer('g6yhft5r4dswerdtguji').isTagged = true;
+    expect(tempGame.isGameOver()).toBeTruthy();
   });
 });

@@ -49,8 +49,14 @@ module.exports = class Game {
 
   isGameOver() {
     if (this.startTime === undefined) throw new Error('Game has not started yet');
-    // TODO: Check if all runners tagged
-    return (Date.now() - this.startTime >= this.gameDuration);
+
+    const iterator = this.players.get(GAME_ROOMS.GAME).values();
+    let iteratorResult = iterator.next();
+    while (!iteratorResult.done) {
+      if (!iteratorResult.value.isTagged && iteratorResult.value.character !== 'monkee') return false;
+      iteratorResult = iterator.next();
+    }
+    return true;
   }
 
   getPlayerRoom(socketId) {
