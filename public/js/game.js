@@ -162,6 +162,7 @@ module.exports = class Game {
     Game.verifyValidSocketId(socketId);
 
     this.getPlayer(socketId, GAME_ROOMS.GAME).character = characterName;
+    this.getPlayer(socketId, GAME_ROOMS.GAME).speed = 160;
   }
 
   updateReadyPlayer(socketId) {

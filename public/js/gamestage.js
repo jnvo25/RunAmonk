@@ -98,16 +98,16 @@ export default class GameStage extends Phaser.Scene {
 
     // Create player
     const playerData = this.registry.get('playerData');
-    this.data.set('playerSprite', this.createPlayer(playerData.position.x, playerData.position.y, playerData.character, playerData.isChaser));
+    this.data.set('playerSprite', this.createPlayer(playerData.position.x, playerData.position.y, playerData.character, playerData.isChaser, playerData.speed));
 
     // Create other players
     const iterator = this.registry.get('gameRoomOccupants').entries();
     const otherPlayers = new Map();
     let iteratorData = iterator.next();
     while (!iteratorData.done) {
-      const { position, character, isChaser } = iteratorData.value[1];
+      const { position, character, isChaser, speed } = iteratorData.value[1];
       const { x, y } = position;
-      otherPlayers.set(iteratorData.value[0], this.createPlayer(x, y, character, isChaser));
+      otherPlayers.set(iteratorData.value[0], this.createPlayer(x, y, character, isChaser, speed));
       iteratorData = iterator.next();
     }
     this.data.set('otherPlayers', otherPlayers);
@@ -136,11 +136,11 @@ export default class GameStage extends Phaser.Scene {
       }
     }
     if (this.cursors.left.isDown) {
-      playerSprite.setVelocityX(-160);
+      playerSprite.setVelocityX(-playerSprite.speed);
       playerSprite.setFlipX(true);
       playerSprite.anims.play(`${playerSprite.character}-run`, true);
     } else if (this.cursors.right.isDown) {
-      playerSprite.setVelocityX(160);
+      playerSprite.setVelocityX(playerSprite.speed);
       playerSprite.setFlipX(false);
       playerSprite.anims.play(`${playerSprite.character}-run`, true);
     } else {
@@ -173,7 +173,7 @@ export default class GameStage extends Phaser.Scene {
     }
   }
 
-  createPlayer(positionX, positionY, character, isChaser) {
+  createPlayer(positionX, positionY, character, isChaser, speed) {
     const tempPlayerSprite = this.physics.add.sprite(positionX, positionY, `${character}-idle`);
 
     // Character data
@@ -181,6 +181,7 @@ export default class GameStage extends Phaser.Scene {
     tempPlayerSprite.id = this.registry.get('socketId');
     tempPlayerSprite.character = character;
     tempPlayerSprite.isChaser = isChaser;
+    tempPlayerSprite.speed = speed;
     this.registry.get((isChaser) ? 'chaserGroup' : 'runnerGroup').add(tempPlayerSprite);
 
     // Character appearance
@@ -260,12 +261,13 @@ export default class GameStage extends Phaser.Scene {
           playerSprite.y,
           playerSprite.flipX,
           playerSprite.character,
+          playerSprite.speed,
         );
       }
     });
   }
 
-  generateDecoy(x, y, flip, character) {
+  generateDecoy(x, y, flip, character, speed) {
     const decoySprite = this.physics.add.sprite(x, y, `${character}-run`);
 
     // Character data
@@ -279,7 +281,7 @@ export default class GameStage extends Phaser.Scene {
     decoySprite.setCollideWorldBounds(true);
     this.physics.add.collider(decoySprite, this.platforms);
 
-    decoySprite.setVelocityX(160 * (flip ? -1 : 1));
+    decoySprite.setVelocityX(speed * (flip ? -1 : 1));
     decoySprite.setFlipX(decoySprite.body.velocity.x < 0);
     setTimeout(() => {
       decoySprite.anims.play(`${character}-death`);

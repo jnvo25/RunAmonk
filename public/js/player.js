@@ -4,6 +4,7 @@ module.exports = class Player {
     this.isReady = false;
     this.isTagged = false;
     this.isChaser = false;
+    this.speed = false;
     this.position = undefined;
     this.specialMoveCooldown = undefined;
   }
@@ -13,6 +14,7 @@ module.exports = class Player {
     this.isReady = false;
     this.isTagged = false;
     this.isChaser = false;
+    this.speed = false;
     this.position = undefined;
     this.specialMoveCooldown = undefined;
   }
