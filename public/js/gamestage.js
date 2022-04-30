@@ -178,7 +178,7 @@ export default class GameStage extends Phaser.Scene {
     this.registry.get((isChaser) ? 'chaserGroup' : 'runnerGroup').add(tempPlayerSprite);
 
     // Character appearance
-    if(tempPlayerSprite.character === 'piggee') {
+    if (tempPlayerSprite.character === 'piggee') {
       tempPlayerSprite.setScale(1.7);
       tempPlayerSprite.setSize(14, 13);
       tempPlayerSprite.setOffset(9, 14);
