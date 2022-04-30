@@ -9,7 +9,7 @@ export default class PregameStage extends Phaser.Scene {
 
   create() {
     this.playerCircles = new Set();
-    this.setupSockets();
+    if (this.registry.get('firstRun')) this.setupSockets();
     this.button = new Button(400, 400, 'Ready', this, () => {
       this.socket.emit('client_playerReady');
     });

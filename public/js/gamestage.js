@@ -80,7 +80,7 @@ export default class GameStage extends Phaser.Scene {
 
     // Setup communications with server
     this.socket = this.registry.get('socket');
-    this.setupSockets();
+    if (this.registry.get('firstRun')) this.setupSockets();
 
     // Get variables ready
     this.registry.set('chaserGroup', this.add.group());
@@ -106,7 +106,8 @@ export default class GameStage extends Phaser.Scene {
     let iteratorData = iterator.next();
     while (!iteratorData.done) {
       const { position, character, isChaser } = iteratorData.value[1];
-      otherPlayers.set(iteratorData.value[0], this.createPlayer(position.x, position.y, character, isChaser));
+      const { x, y } = position;
+      otherPlayers.set(iteratorData.value[0], this.createPlayer(x, y, character, isChaser));
       iteratorData = iterator.next();
     }
     this.data.set('otherPlayers', otherPlayers);

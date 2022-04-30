@@ -34,6 +34,7 @@ export default class MainStage extends Phaser.Scene {
     this.registry.set('spacebar', this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE));
     this.registry.set('screenCenterX', this.cameras.main.worldView.x + this.cameras.main.width / 2);
     this.registry.set('screenCenterY', this.cameras.main.worldView.y + this.cameras.main.height / 2);
+    this.registry.set('firstRun', true);
   }
 
   setupSockets() {
@@ -66,6 +67,7 @@ export default class MainStage extends Phaser.Scene {
 
     this.socket.on('server_gameOver', () => {
       this.game.sound.stopAll();
+      this.registry.set('firstRun', false);
       this.launchScene(SCENES.PostgameStage);
     });
   }
