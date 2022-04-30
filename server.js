@@ -69,7 +69,7 @@ io.on('connection', (socket) => {
   socket.on('client_movementUpdate', ({
     velX, velY, flip, anim,
   }) => {
-    if (!Game.isPlayerTagged(socket.id)) {
+    if (Game.gameStatus === GAME_STATUS.PLAYING && !Game.isPlayerTagged(socket.id)) {
       socket.broadcast.emit('server_movementUpdate', {
         velX, velY, flip, anim, socketId: socket.id,
       });
@@ -81,7 +81,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('client_positionUpdate', ({ x, y }) => {
-    if (!Game.isPlayerTagged(socket.id)) socket.broadcast.emit('server_positionUpdate', { x, y, socketId: socket.id });
+    if (Game.gameStatus === GAME_STATUS.PLAYING && !Game.isPlayerTagged(socket.id)) socket.broadcast.emit('server_positionUpdate', { x, y, socketId: socket.id });
   });
 
   socket.on('client_tagged', () => {
