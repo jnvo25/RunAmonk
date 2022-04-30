@@ -85,6 +85,7 @@ export default class GameStage extends Phaser.Scene {
     // Get variables ready
     this.registry.set('chaserGroup', this.add.group());
     this.registry.set('runnerGroup', this.add.group());
+    this.data.set('boxGroup', this.add.group());
     this.cursors = this.registry.get('cursors');
 
     // Handle overlap tag
@@ -93,6 +94,17 @@ export default class GameStage extends Phaser.Scene {
       if (!player2.isChaser) this.registry.get('runnerGroup').remove(player2);
       if (!this.data.get('playerSprite').isChaser) {
         this.registry.get('socket').emit('client_tagged');
+      }
+    });
+
+    this.physics.add.collider(this.registry.get('runnerGroup'), this.data.get('boxGroup'), (player1, player2) => {
+      if (player2.id && player2.id === this.registry.get('socketId')) {
+        player1.destroy();
+        this.registry.get('socket').emit('client_slowed');
+      }
+      if (player1.id && player1.id === this.registry.get('socketId')) {
+        player2.destroy();
+        this.registry.get('socket').emit('client_slowed');
       }
     });
 
@@ -105,7 +117,9 @@ export default class GameStage extends Phaser.Scene {
     const otherPlayers = new Map();
     let iteratorData = iterator.next();
     while (!iteratorData.done) {
-      const { position, character, isChaser, speed } = iteratorData.value[1];
+      const {
+        position, character, isChaser, speed,
+      } = iteratorData.value[1];
       const { x, y } = position;
       otherPlayers.set(iteratorData.value[0], this.createPlayer(x, y, character, isChaser, speed));
       iteratorData = iterator.next();
@@ -231,6 +245,13 @@ export default class GameStage extends Phaser.Scene {
       }
     });
 
+    this.socket.on('server_speedUpdate', ({ speed, duration }) => {
+      this.data.get('playerSprite').speed = speed;
+      setTimeout(() => {
+        this.data.get('playerSprite').speed = this.registry.get('playerData').speed;
+      }, duration);
+    });
+
     this.socket.on('server_specialMoveGranted', ({ socketId }) => {
       const playerSprite = socketId === this.registry.get('socketId')
         ? this.data.get('playerSprite')
@@ -304,6 +325,7 @@ export default class GameStage extends Phaser.Scene {
     decoySprite.setVelocityX(250 * (flip ? -1 : 1));
     decoySprite.setVelocityY(-300);
     decoySprite.setFlipX(decoySprite.body.velocity.x < 0);
+    this.data.get('boxGroup').add(decoySprite);
   }
 
   // Add animation to phaser

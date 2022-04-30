@@ -90,4 +90,9 @@ io.on('connection', (socket) => {
     Game.updatePlayerTagged(socket.id);
     io.emit('server_tagUpdate', socket.id);
   });
+
+  socket.on('client_slowed', () => {
+    // const {duration, speed} = Game.updatePlayerSlowed(socket.id);
+    socket.emit('server_speedUpdate', { duration: 5000, speed: 80 });
+  });
 });
