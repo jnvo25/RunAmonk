@@ -3,7 +3,7 @@ const GAME_STATUS = {
   PLAYING: 'playing',
 };
 // TODO: Add 20 for every person
-const GAME_DURATION = 10 * 1000; // Seconds to MS
+const GAME_DURATION = 40 * 1000; // Seconds to MS
 
 const GAME_ROOMS = {
   WAITING: 'waiting',
