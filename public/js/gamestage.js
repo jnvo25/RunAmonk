@@ -215,33 +215,45 @@ export default class GameStage extends Phaser.Scene {
         ? this.data.get('playerSprite')
         : this.data.get('otherPlayers').get(socketId);
 
-      const playerData = {
-        x: playerSprite.x,
-        y: playerSprite.y,
-        velX: playerSprite.body.velocity.x,
-        velY: playerSprite.body.velocity.y,
-        character: playerSprite.character,
-      };
-      const decoySprite = this.physics.add.sprite(playerData.x, playerData.y, `${playerData.character}-run`);
-
-      // Character data
-      decoySprite.anims.play(`${playerData.character}-run`, true);
-
-      // Character appearance
-      decoySprite.setSize(14, 27);
-      decoySprite.setOffset(8, 5);
-
-      // Character physics
-      decoySprite.setCollideWorldBounds(true);
-      this.physics.add.collider(decoySprite, this.platforms);
-
-      decoySprite.setVelocityX(playerData.velX === 0 ? 160 * (playerSprite.flipX ? 1 : -1): -playerData.velX);
-      decoySprite.setFlipX(decoySprite.body.velocity.x < 0);
+      // Set invisible for other players
+      if (socketId !== this.registry.get('socketId')) {
+        playerSprite.setAlpha(0);
+      } else {
+        playerSprite.setAlpha(0.3);
+      }
+      // Make player visible after 1 second
       setTimeout(() => {
-        decoySprite.anims.play(`${playerData.character}-death`);
-        this.grunt.play();
-      }, 3000);
+        playerSprite.setAlpha(1);
+      }, 1000);
+      this.generateDecoy(
+        playerSprite.x,
+        playerSprite.y,
+        playerSprite.flipX,
+        playerSprite.character,
+      );
     });
+  }
+
+  generateDecoy(x, y, flip, character) {
+    const decoySprite = this.physics.add.sprite(x, y, `${character}-run`);
+
+    // Character data
+    decoySprite.anims.play(`${character}-run`, true);
+
+    // Character appearance
+    decoySprite.setSize(14, 27);
+    decoySprite.setOffset(8, 5);
+
+    // Character physics
+    decoySprite.setCollideWorldBounds(true);
+    this.physics.add.collider(decoySprite, this.platforms);
+
+    decoySprite.setVelocityX(160 * (flip ? -1 : 1));
+    decoySprite.setFlipX(decoySprite.body.velocity.x < 0);
+    setTimeout(() => {
+      decoySprite.anims.play(`${character}-death`);
+      this.grunt.play();
+    }, 3000);
   }
 
   // Add animation to phaser
