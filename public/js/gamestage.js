@@ -10,6 +10,7 @@ export default class GameStage extends Phaser.Scene {
   }
 
   preload() {
+    // this.load.setPath('assets/audio/tech');
     // Load  Monkee assets
     this.load.spritesheet('monkee-idle', 'assets/Monkee_Monster/Monkee_Monster_Idle_18.png', { frameWidth: 32, frameHeight: 32 });
     this.load.spritesheet('monkee-run', 'assets/Monkee_Monster/Monkee_Monster_Run_8.png', { frameWidth: 32, frameHeight: 32 });
@@ -24,6 +25,12 @@ export default class GameStage extends Phaser.Scene {
     this.load.spritesheet('owlet-run', 'assets/Owlet_Monster/Owlet_Monster_Run_6.png', { frameWidth: 32, frameHeight: 32 });
     this.load.spritesheet('owlet-jump', 'assets/Owlet_Monster/Owlet_Monster_Jump_8.png', { frameWidth: 32, frameHeight: 32 });
     this.load.spritesheet('owlet-death', 'assets/Owlet_Monster/Owlet_Monster_Death_8.png', { frameWidth: 32, frameHeight: 32 });
+
+    // Load audio
+    this.load.audio('jump', 'assets/Sounds/jump.mp3');
+    this.load.audio('background', 'assets/Sounds/background.mp3');
+    this.load.audio('grunt', 'assets/Sounds/grunt.mp3');
+    this.load.audio('punch', 'assets/Sounds/punch.mp3');
 
     // Load stage assets
     this.load.image('background', 'assets/maps/images/background.png');
@@ -52,6 +59,13 @@ export default class GameStage extends Phaser.Scene {
 
     this.createAnimation('monkee-idle', 17, true);
     this.createAnimation('monkee-run', 7, true);
+
+    // Create sounds
+    this.jump = this.sound.add('jump', { volume: 0.3, detune: 400 });
+    this.background = this.sound.add('background', { volume: 0.2, detune: 200 });
+    this.background.play();
+    this.punch = this.sound.add('punch', { volume: 0.2 });
+    this.grunt = this.sound.add('grunt', { volume: 0.2, detune: 400 });
 
     // Setup communications with server
     this.socket = this.registry.get('socket');
@@ -102,6 +116,7 @@ export default class GameStage extends Phaser.Scene {
 
     if (this.cursors.up.isDown) {
       if (playerSprite.body.onFloor()) {
+        this.jump.play();
         playerSprite.setVelocityY(-400);
       }
     }
@@ -180,6 +195,8 @@ export default class GameStage extends Phaser.Scene {
     });
 
     this.socket.on('server_tagUpdate', (socketId) => {
+      this.punch.play();
+      this.grunt.play();
       if (socketId === this.registry.get('socketId')) {
         this.data.get('playerSprite').isTagged = true;
         this.data.get('playerSprite').anims.play(`${this.data.get('playerSprite').character}-death`);
