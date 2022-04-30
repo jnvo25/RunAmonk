@@ -47,6 +47,7 @@ export default class MainStage extends Phaser.Scene {
     });
 
     this.socket.on('server_playAgainGranted', () => {
+      console.log('playagain');
       this.launchScene(SCENES.PregameStage);
     });
 
