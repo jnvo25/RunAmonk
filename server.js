@@ -22,7 +22,6 @@ server.listen(process.env.PORT || 8080, () => { // Uses port set by heroku
 const GameObject = require('./public/js/game');
 
 const Game = new GameObject();
-let timeout;
 
 // Handle connections
 io.on('connection', (socket) => {

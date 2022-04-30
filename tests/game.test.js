@@ -5,12 +5,6 @@ import {
 import { GAME_STATUS } from '../public/js/config';
 import Game from '../public/js/game';
 
-function getFutureDate(seconds) {
-  const t = new Date();
-  t.setSeconds(t.getSeconds() + seconds);
-  return t;
-}
-
 jest.useFakeTimers();
 
 describe('Game Class', () => {
