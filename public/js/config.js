@@ -3,7 +3,7 @@ const GAME_STATUS = {
   PLAYING: 'playing',
 };
 
-const GAME_DURATION = 100 * 1000; // Seconds to MS
+const GAME_DURATION = 10 * 1000; // Seconds to MS
 
 const GAME_ROOMS = {
   WAITING: 'waiting',
@@ -13,6 +13,8 @@ const GAME_ROOMS = {
 
 const SPAWN_COORDS = [{ x: 400, y: 400 }, { x: 700, y: 300 }, { x: 100, y: 300 }];
 
+const CHARACTERS = ['monkee', 'pinkie', 'owlet'];
+
 module.exports = {
-  GAME_STATUS, GAME_DURATION, GAME_ROOMS, SPAWN_COORDS,
+  GAME_STATUS, GAME_DURATION, GAME_ROOMS, SPAWN_COORDS, CHARACTERS,
 };

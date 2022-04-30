@@ -72,4 +72,9 @@ io.on('connection', (socket) => {
   socket.on('client_positionUpdate', ({ x, y }) => {
     socket.broadcast.emit('server_positionUpdate', { x, y, socketId: socket.id });
   });
+
+  socket.on('client_tagged', () => {
+    Game.updatePlayerTagged(socket.id);
+    io.emit('server_tagUpdate', socket.id);
+  });
 });

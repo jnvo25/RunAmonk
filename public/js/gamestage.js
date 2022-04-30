@@ -62,6 +62,15 @@ export default class GameStage extends Phaser.Scene {
     this.registry.set('runnerGroup', this.add.group());
     this.cursors = this.registry.get('cursors');
 
+    // Handle overlap tag
+    this.physics.add.overlap(this.registry.get('runnerGroup'), this.registry.get('monkeeGroup'), (player1, player2) => {
+      if (player1.character !== 'monkee') this.registry.get('runnerGroup').remove(player1);
+      if (player2.character !== 'monkee') this.registry.get('runnerGroup').remove(player2);
+      if (this.data.get('playerSprite').character !== 'monkee') {
+        this.registry.get('socket').emit('client_tagged');
+      }
+    });
+
     // Create player
     const playerData = this.registry.get('playerData');
     this.data.set('playerSprite', this.createPlayer(playerData.position.x, playerData.position.y, playerData.character));
@@ -89,6 +98,8 @@ export default class GameStage extends Phaser.Scene {
 
   readPlayerInput() {
     const playerSprite = this.data.get('playerSprite');
+    if (this.data.get('playerSprite').isTagged) return;
+
     if (this.cursors.up.isDown) {
       if (playerSprite.body.onFloor()) {
         playerSprite.setVelocityY(-400);
@@ -166,6 +177,20 @@ export default class GameStage extends Phaser.Scene {
     this.socket.on('server_positionUpdate', ({ x, y, socketId }) => {
       const movedPlayerSprite = this.data.get('otherPlayers').get(socketId);
       movedPlayerSprite.setPosition(x, y);
+    });
+
+    this.socket.on('server_tagUpdate', (socketId) => {
+      if (socketId === this.registry.get('socketId')) {
+        console.log('Player tagged');
+        this.data.get('playerSprite').isTagged = true;
+        this.data.get('playerSprite').anims.play(`${this.data.get('playerSprite').character}-death`);
+        this.data.get('playerSprite').setVelocity(0, 0);
+      } else {
+        console.log('Other player tagged');
+        const taggedPlayer = this.data.get('otherPlayers').get(socketId);
+        taggedPlayer.anims.play(`${taggedPlayer.character}-death`);
+        taggedPlayer.setVelocity(0, 0);
+      }
     });
   }
 

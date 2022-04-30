@@ -44,7 +44,7 @@ module.exports = class Game {
 
   isGameOver() {
     if (this.startTime === undefined) throw new Error('Game has not started yet');
-
+    // TODO: Check if all runners tagged
     return (Date.now() - this.startTime >= this.gameDuration);
   }
 
@@ -87,6 +87,12 @@ module.exports = class Game {
     // Copy to new and delete original
     this.players.get(room).set(socketId, tempPlayer);
     this.players.get(playerState).delete(socketId);
+  }
+
+  updatePlayerTagged(socketId) {
+    Game.verifyValidSocketId(socketId);
+
+    this.getPlayer(socketId, GAME_ROOMS.GAME).isTagged = true;
   }
 
   updatePlayerPosition(socketId, { x, y }) {
