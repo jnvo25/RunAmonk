@@ -133,12 +133,22 @@ export default class GameStage extends Phaser.Scene {
 
     // Create timer
     this.timer = this.add.text(738, 35, (this.registry.get('gameDuration') - Date.now() - this.registry.get('startTime')), { backgroundColor: '#ffo', fontSize: '40px' }).setOrigin(0.5);
-    // console.log(this.registry.get('gameRoomOccupants'));
+    this.specialMoveTime = 0;
+    this.specialTimer = this.add.text(125, 35, '', { backgroundColor: '#ffo', fontSize: '20px' }).setOrigin(0.5);
+    console.log(this.registry.get('gameRoomOccupants'));
   }
 
   update() {
     this.readPlayerInput();
     this.timer.setText(getTime(this.registry.get('startTime'), this.registry.get('gameDuration')));
+
+    // Special timer
+    const specialTime = getTime(this.specialMoveTime, 6000);
+    if (specialTime > 0) {
+      this.specialTimer.setText(`SkillCooldown: ${specialTime}`);
+    } else {
+      this.specialTimer.setText('');
+    }
   }
 
   readPlayerInput() {
@@ -258,6 +268,7 @@ export default class GameStage extends Phaser.Scene {
     });
 
     this.socket.on('server_specialMoveGranted', ({ socketId }) => {
+      this.specialMoveTime = Date.now();
       const playerSprite = socketId === this.registry.get('socketId')
         ? this.data.get('playerSprite')
         : this.data.get('otherPlayers').get(socketId);
