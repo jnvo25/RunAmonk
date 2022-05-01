@@ -135,7 +135,6 @@ export default class GameStage extends Phaser.Scene {
     this.timer = this.add.text(738, 35, (this.registry.get('gameDuration') - Date.now() - this.registry.get('startTime')), { backgroundColor: '#ffo', fontSize: '40px' }).setOrigin(0.5);
     this.specialMoveTime = 0;
     this.specialTimer = this.add.text(125, 35, '', { backgroundColor: '#ffo', fontSize: '20px' }).setOrigin(0.5);
-    console.log(this.registry.get('gameRoomOccupants'));
   }
 
   update() {
@@ -330,6 +329,9 @@ export default class GameStage extends Phaser.Scene {
     decoySprite.setFlipX(decoySprite.body.velocity.x < 0);
     setTimeout(() => {
       decoySprite.anims.play(`${character}-death`);
+      decoySprite.once('animationcomplete', () => {
+        decoySprite.destroy();
+      });
       this.grunt.play();
     }, 3000);
   }
