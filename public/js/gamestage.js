@@ -273,10 +273,13 @@ export default class GameStage extends Phaser.Scene {
     });
 
     this.socket.on('server_specialMoveGranted', ({ socketId }) => {
-      this.specialMoveTime = Date.now();
-      const playerSprite = socketId === this.registry.get('socketId')
-        ? this.data.get('playerSprite')
-        : this.data.get('otherPlayers').get(socketId);
+      let playerSprite;
+      if (socketId === this.registry.get('socketId')) {
+        this.specialMoveTime = Date.now();
+        playerSprite = this.data.get('playerSprite');
+      } else {
+        playerSprite = this.data('otherPlayers').get(socketId);
+      }
 
       // Set invisible for other players
       if (playerSprite.character === 'piggee') {
