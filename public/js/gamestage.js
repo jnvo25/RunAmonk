@@ -181,27 +181,20 @@ export default class GameStage extends Phaser.Scene {
       playerSprite.anims.play(`${playerSprite.character}-idle`, true);
     }
 
-    const playerPosition = {
-      x: playerSprite.x,
-      y: playerSprite.y,
+    const playerMovementData = {
       velX: playerSprite.body.velocity.x,
       velY: playerSprite.body.velocity.y,
+      flip: playerSprite.flipX,
+      anim: playerSprite.anims.getName(),
     };
-    if (!this.data.get('playerPosition')
-      || playerSprite.body.velocity.x !== this.data.get('playerPosition').velX
-      || playerSprite.body.velocity.y !== this.data.get('playerPosition').velY) {
-      this.registry.get('socket').emit('client_movementUpdate', {
-        velX: playerSprite.body.velocity.x,
-        velY: playerSprite.body.velocity.y,
-        flip: playerSprite.flipX,
-        anim: playerSprite.anims.getName(),
-      });
-      this.data.set('playerPosition', playerPosition);
+    if (!Object.is(playerMovementData, this.data.get('prevPlayerMovementData'))) {
+      this.registry.get('socket').emit('client_movementUpdate', { ...playerMovementData });
+      this.data.set('prevPlayerMovementData', playerMovementData);
     }
     if (!this.data.get('positionLastUpdated') || Date.now() - this.data.get('positionLastUpdated') > 500) {
       this.registry.get('socket').emit('client_positionUpdate', {
-        x: playerPosition.x,
-        y: playerPosition.y,
+        x: playerSprite.x,
+        y: playerSprite.y,
       });
     }
   }
