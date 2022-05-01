@@ -278,7 +278,7 @@ export default class GameStage extends Phaser.Scene {
         this.specialMoveTime = Date.now();
         playerSprite = this.data.get('playerSprite');
       } else {
-        playerSprite = this.data('otherPlayers').get(socketId);
+        playerSprite = this.data.get('otherPlayers').get(socketId);
       }
 
       // Set invisible for other players
