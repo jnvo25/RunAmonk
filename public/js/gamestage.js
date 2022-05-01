@@ -76,7 +76,7 @@ export default class GameStage extends Phaser.Scene {
     // Create sounds
     this.jump = this.sound.add('jump', { volume: 0.3, detune: 400 });
     this.background = this.sound.add('background', { volume: 0.2, detune: 200 });
-    // this.background.play();
+    this.background.play();
     this.punch = this.sound.add('punch', { volume: 0.2 });
     this.grunt = this.sound.add('grunt', { volume: 0.2, detune: 400 });
     this.smallPunch = this.sound.add('small-punch', { volume: 0.2, detune: 400 });
