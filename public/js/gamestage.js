@@ -140,7 +140,12 @@ export default class GameStage extends Phaser.Scene {
 
   update() {
     this.readPlayerInput();
-    this.timer.setText(getTime(this.registry.get('startTime'), this.registry.get('gameDuration')));
+    const gameTime = getTime(this.registry.get('startTime'), this.registry.get('gameDuration'));
+    if (gameTime > 0) {
+      this.timer.setText(gameTime);
+    } else {
+      this.timer.setText('');
+    }
 
     // Special timer
     const specialTime = getTime(this.specialMoveTime, 6000);
