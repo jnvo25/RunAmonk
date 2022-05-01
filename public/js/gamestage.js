@@ -37,6 +37,8 @@ export default class GameStage extends Phaser.Scene {
     this.load.audio('background', 'assets/Sounds/background.mp3');
     this.load.audio('grunt', 'assets/Sounds/grunt.mp3');
     this.load.audio('punch', 'assets/Sounds/punch.mp3');
+    this.load.audio('small-punch', 'assets/Sounds/small-punch.wav');
+    this.load.audio('crate-break', 'assets/Sounds/crate-break.wav');
 
     // Load stage assets
     this.load.image('background', 'assets/maps/images/background.png');
@@ -74,9 +76,11 @@ export default class GameStage extends Phaser.Scene {
     // Create sounds
     this.jump = this.sound.add('jump', { volume: 0.3, detune: 400 });
     this.background = this.sound.add('background', { volume: 0.2, detune: 200 });
-    this.background.play();
+    // this.background.play();
     this.punch = this.sound.add('punch', { volume: 0.2 });
     this.grunt = this.sound.add('grunt', { volume: 0.2, detune: 400 });
+    this.smallPunch = this.sound.add('small-punch', { volume: 0.2, detune: 400 });
+    this.crateBreak = this.sound.add('crate-break', { volume: 0.8 });
 
     // Setup communications with server
     this.socket = this.registry.get('socket');
@@ -97,20 +101,18 @@ export default class GameStage extends Phaser.Scene {
       }
     });
 
-    this.physics.add.collider(this.registry.get('runnerGroup'), this.data.get('boxGroup'), (player1, player2) => {
-      if (player2.id && player2.id === this.registry.get('socketId')) {
-        player1.destroy();
-        this.registry.get('socket').emit('client_slowed');
-      }
-      if (player1.id && player1.id === this.registry.get('socketId')) {
-        player2.destroy();
+    this.physics.add.collider(this.registry.get('runnerGroup'), this.data.get('boxGroup'), (runner, box) => {
+      this.smallPunch.play();
+      this.crateBreak.play();
+      box.destroy();
+      if (runner.id === this.registry.get('socketId')) {
         this.registry.get('socket').emit('client_slowed');
       }
     });
 
     // Create player
     const playerData = this.registry.get('playerData');
-    this.data.set('playerSprite', this.createPlayer(playerData.position.x, playerData.position.y, playerData.character, playerData.isChaser, playerData.speed));
+    this.data.set('playerSprite', this.createPlayer(this.registry.get('socketId'), playerData.position.x, playerData.position.y, playerData.character, playerData.isChaser, playerData.speed));
 
     // Create other players
     const iterator = this.registry.get('gameRoomOccupants').entries();
@@ -121,7 +123,10 @@ export default class GameStage extends Phaser.Scene {
         position, character, isChaser, speed,
       } = iteratorData.value[1];
       const { x, y } = position;
-      otherPlayers.set(iteratorData.value[0], this.createPlayer(x, y, character, isChaser, speed));
+      otherPlayers.set(
+        iteratorData.value[0],
+        this.createPlayer(iteratorData.value[0], x, y, character, isChaser, speed),
+      );
       iteratorData = iterator.next();
     }
     this.data.set('otherPlayers', otherPlayers);
@@ -187,12 +192,12 @@ export default class GameStage extends Phaser.Scene {
     }
   }
 
-  createPlayer(positionX, positionY, character, isChaser, speed) {
+  createPlayer(socketId, positionX, positionY, character, isChaser, speed) {
     const tempPlayerSprite = this.physics.add.sprite(positionX, positionY, `${character}-idle`);
 
     // Character data
     tempPlayerSprite.anims.play(`${character}-idle`, true);
-    tempPlayerSprite.id = this.registry.get('socketId');
+    tempPlayerSprite.id = socketId;
     tempPlayerSprite.character = character;
     tempPlayerSprite.isChaser = isChaser;
     tempPlayerSprite.speed = speed;
