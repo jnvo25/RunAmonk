@@ -91,6 +91,7 @@ export default class GameStage extends Phaser.Scene {
     this.registry.set('runnerGroup', this.add.group());
     this.data.set('boxGroup', this.add.group());
     this.cursors = this.registry.get('cursors');
+    this.data.set('clientTagged', false);
 
     // Handle overlap tag
     this.physics.add.overlap(this.registry.get('runnerGroup'), this.registry.get('chaserGroup'), (player1, player2) => {
@@ -138,7 +139,7 @@ export default class GameStage extends Phaser.Scene {
   }
 
   update() {
-    this.readPlayerInput();
+    if (!this.data.get('clientTagged')) this.readPlayerInput();
     const gameTime = getTime(this.registry.get('startTime'), this.registry.get('gameDuration'));
     if (gameTime > 0) {
       this.timer.setText(gameTime);
@@ -160,7 +161,6 @@ export default class GameStage extends Phaser.Scene {
     if (this.registry.get('spacebar').isDown) {
       this.registry.get('socket').emit('client_specialMove');
     }
-    if (this.data.get('playerSprite').isTagged) return;
 
     if (this.cursors.up.isDown) {
       if (playerSprite.body.onFloor()) {
@@ -247,13 +247,10 @@ export default class GameStage extends Phaser.Scene {
       this.punch.play();
       this.grunt.play();
       if (socketId === this.registry.get('socketId')) {
-        this.data.get('playerSprite').isTagged = true;
-        this.data.get('playerSprite').anims.play(`${this.data.get('playerSprite').character}-death`);
-        this.data.get('playerSprite').setVelocity(0, 0);
+        this.data.set('clientTagged', true);
+        this.destroyOnAnimationComplete(this.data.get('playerSprite'));
       } else {
-        const taggedPlayer = this.data.get('otherPlayers').get(socketId);
-        taggedPlayer.anims.play(`${taggedPlayer.character}-death`);
-        taggedPlayer.setVelocity(0, 0);
+        this.destroyOnAnimationComplete(this.data.get('otherPlayers').get(socketId));
       }
     });
 
@@ -309,6 +306,7 @@ export default class GameStage extends Phaser.Scene {
 
     // Character data
     decoySprite.anims.play(`${character}-run`, true);
+    decoySprite.character = character;
 
     // Character appearance
     decoySprite.setSize(14, 27);
@@ -321,12 +319,16 @@ export default class GameStage extends Phaser.Scene {
     decoySprite.setVelocityX(speed * (flip ? -1 : 1));
     decoySprite.setFlipX(decoySprite.body.velocity.x < 0);
     setTimeout(() => {
-      decoySprite.anims.play(`${character}-death`);
-      decoySprite.once('animationcomplete', () => {
-        decoySprite.destroy();
-      });
+      this.destroyOnAnimationComplete(decoySprite);
       this.grunt.play();
     }, 3000);
+  }
+
+  destroyOnAnimationComplete(sprite) {
+    if (this.anims.exists(`${sprite.character}-death`)) sprite.anims.play(`${sprite.character}-death`);
+    sprite.once('animationcomplete', () => {
+      sprite.destroy();
+    });
   }
 
   generateBoxThrow(x, y, flip) {
