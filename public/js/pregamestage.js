@@ -13,6 +13,11 @@ export default class PregameStage extends Phaser.Scene {
     this.button = new Button(400, 400, 'Ready', this, () => {
       this.socket.emit('client_playerReady');
     });
+    if (this.registry.get('firstRun')) {
+      const pregameRoomPlayers = this.registry.get('pregameOccupants');
+      const readyPlayers = pregameRoomPlayers.filter((player) => player.isReady).length;
+      this.updatePlayerCircles(readyPlayers, pregameRoomPlayers.length);
+    }
   }
 
   setupSockets() {

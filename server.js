@@ -28,7 +28,9 @@ io.on('connection', (socket) => {
   socket.emit('welcome', {
     socketId: socket.id,
     playerRoom: Game.addPlayer(socket.id),
-
+    ...(Game.gameStatus === GAME_STATUS.IDLE && {
+      pregameOccupants: Array.from(Game.players.get('pregame').values()),
+    }),
     // Send start time and duration if game is in progress
     ...(Game.gameStatus === GAME_STATUS.PLAYING && {
       startTime: Game.startTime,

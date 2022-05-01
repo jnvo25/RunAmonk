@@ -45,6 +45,7 @@ export default class MainStage extends Phaser.Scene {
         this.registry.set('gameDuration', welcomeInfo.gameDuration);
         this.launchScene(SCENES.WaitingStage);
       } else {
+        this.registry.set('pregameOccupants', welcomeInfo.pregameOccupants);
         this.launchScene(SCENES.PregameStage);
       }
     });
