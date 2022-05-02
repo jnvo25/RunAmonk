@@ -8,80 +8,12 @@ export default class GameStage extends Phaser.Scene {
     super('GameStage');
   }
 
-  preload() {
-    // this.load.setPath('assets/audio/tech');
-    // Load  Monkee assets
-    this.load.spritesheet('monkee-idle', 'assets/Monkee_Monster/Monkee_Monster_Idle_18.png', { frameWidth: 32, frameHeight: 32 });
-    this.load.spritesheet('monkee-run', 'assets/Monkee_Monster/Monkee_Monster_Run_8.png', { frameWidth: 32, frameHeight: 32 });
+  // preload() {
+  //   // this.load.setPath('assets/audio/tech');
 
-    // Load  Piggee assets
-    this.load.spritesheet('piggee-idle', 'assets/Piggee_Monster/Piggee_Monster_Idle_11.png', { frameWidth: 34, frameHeight: 28 });
-    this.load.spritesheet('piggee-run', 'assets/Piggee_Monster/Piggee_Monster_Run_6.png', { frameWidth: 34, frameHeight: 28 });
-    this.load.spritesheet('piggee-special-idle', 'assets/Piggee_Monster/Piggee_Monster_Special_Idle_9.png', { frameWidth: 26, frameHeight: 30 });
-    this.load.spritesheet('piggee-special-run', 'assets/Piggee_Monster/Piggee_Monster_Special_Run_6.png', { frameWidth: 26, frameHeight: 30 });
-    this.load.image('piggee-box', 'assets/Piggee_Monster/Piggee_Monster_Box.png');
-
-    // Load Pinkie assets
-    this.load.spritesheet('pinkie-idle', 'assets/Pink_Monster/Pink_Monster_Idle_4.png', { frameWidth: 32, frameHeight: 32 });
-    this.load.spritesheet('pinkie-run', 'assets/Pink_Monster/Pink_Monster_Run_6.png', { frameWidth: 32, frameHeight: 32 });
-    this.load.spritesheet('pinkie-death', 'assets/Pink_Monster/Pink_Monster_Death_8.png', { frameWidth: 32, frameHeight: 32 });
-
-    // Load Owlet assets
-    this.load.spritesheet('owlet-idle', 'assets/Owlet_Monster/Owlet_Monster_Idle_4.png', { frameWidth: 32, frameHeight: 32 });
-    this.load.spritesheet('owlet-run', 'assets/Owlet_Monster/Owlet_Monster_Run_6.png', { frameWidth: 32, frameHeight: 32 });
-    this.load.spritesheet('owlet-jump', 'assets/Owlet_Monster/Owlet_Monster_Jump_8.png', { frameWidth: 32, frameHeight: 32 });
-    this.load.spritesheet('owlet-death', 'assets/Owlet_Monster/Owlet_Monster_Death_8.png', { frameWidth: 32, frameHeight: 32 });
-
-    // Load audio
-    this.load.audio('jump', 'assets/Sounds/jump.mp3');
-    this.load.audio('background', 'assets/Sounds/background.mp3');
-    this.load.audio('grunt', 'assets/Sounds/grunt.mp3');
-    this.load.audio('punch', 'assets/Sounds/punch.mp3');
-    this.load.audio('small-punch', 'assets/Sounds/small-punch.wav');
-    this.load.audio('crate-break', 'assets/Sounds/crate-break.wav');
-
-    // Load stage assets
-    this.load.image('background', 'assets/maps/images/background.png');
-    this.load.image('spike', 'assets/maps/images/spike.png');
-    this.load.image('tiles', 'assets/maps/tilesets/terrain_tilesheet.png');
-    this.load.tilemapTiledJSON('map', 'assets/maps/tilemaps/homestage.json');
-  }
+  // }
 
   create() {
-    // Create stage
-    const backgroundImage = this.add.image(0, 0, 'background').setOrigin(0, 0);
-    backgroundImage.setScale(2, 0.8);
-    const map = this.make.tilemap({ key: 'map' });
-    const tileset = map.addTilesetImage('terrain_tilesheet', 'tiles');
-    this.platforms = map.createStaticLayer('Platforms', tileset, 0, 0);
-    this.platforms.setCollisionByExclusion(-1, true);
-
-    // Create animations
-    this.createAnimation('owlet-idle', 3, true);
-    this.createAnimation('owlet-run', 5, true);
-    this.createAnimation('owlet-death', 7, false);
-
-    this.createAnimation('pinkie-idle', 3, true);
-    this.createAnimation('pinkie-run', 5, true);
-    this.createAnimation('pinkie-death', 7, false);
-
-    this.createAnimation('monkee-idle', 17, true);
-    this.createAnimation('monkee-run', 7, true);
-
-    this.createAnimation('piggee-idle', 10, true);
-    this.createAnimation('piggee-run', 5, true);
-    this.createAnimation('piggee-special-idle', 8, true);
-    this.createAnimation('piggee-special-run', 5, true);
-
-    // Create sounds
-    this.jump = this.sound.add('jump', { volume: 0.3, detune: 400 });
-    this.background = this.sound.add('background', { volume: 0.2, detune: 200 });
-    this.background.play();
-    this.punch = this.sound.add('punch', { volume: 0.2 });
-    this.grunt = this.sound.add('grunt', { volume: 0.2, detune: 400 });
-    this.smallPunch = this.sound.add('small-punch', { volume: 0.2, detune: 400 });
-    this.crateBreak = this.sound.add('crate-break', { volume: 0.8 });
-
     // Setup communications with server
     this.socket = this.registry.get('socket');
     if (this.registry.get('firstRun')) this.setupSockets();
@@ -103,8 +35,8 @@ export default class GameStage extends Phaser.Scene {
     });
 
     this.physics.add.collider(this.registry.get('runnerGroup'), this.data.get('boxGroup'), (runner, box) => {
-      this.smallPunch.play();
-      this.crateBreak.play();
+      this.sound.play('small-punch');
+      this.sound.play('crate-break');
       box.destroy();
       if (runner.id === this.registry.get('socketId')) {
         this.registry.get('socket').emit('client_slowed');
@@ -164,7 +96,7 @@ export default class GameStage extends Phaser.Scene {
 
     if (this.cursors.up.isDown) {
       if (playerSprite.body.onFloor()) {
-        this.jump.play();
+        this.sound.play('jump');
         playerSprite.setVelocityY(-400);
       }
     }
@@ -222,7 +154,7 @@ export default class GameStage extends Phaser.Scene {
 
     // Character physics
     tempPlayerSprite.setCollideWorldBounds(true);
-    this.physics.add.collider(tempPlayerSprite, this.platforms);
+    this.physics.add.collider(tempPlayerSprite, this.registry.get('platforms'));
 
     return tempPlayerSprite;
   }
@@ -244,8 +176,8 @@ export default class GameStage extends Phaser.Scene {
     });
 
     this.socket.on('server_tagUpdate', (socketId) => {
-      this.punch.play();
-      this.grunt.play();
+      this.sound.play('punch');
+      this.sound.play('grunt');
       if (socketId === this.registry.get('socketId')) {
         this.data.set('clientTagged', true);
         this.destroyOnAnimationComplete(this.data.get('playerSprite'));
@@ -314,13 +246,13 @@ export default class GameStage extends Phaser.Scene {
 
     // Character physics
     decoySprite.setCollideWorldBounds(true);
-    this.physics.add.collider(decoySprite, this.platforms);
+    this.physics.add.collider(decoySprite, this.registry.get('platforms'));
 
     decoySprite.setVelocityX(speed * (flip ? -1 : 1));
     decoySprite.setFlipX(decoySprite.body.velocity.x < 0);
     setTimeout(() => {
       this.destroyOnAnimationComplete(decoySprite);
-      this.grunt.play();
+      this.sound.play('grunt');
     }, 3000);
   }
 
@@ -332,33 +264,20 @@ export default class GameStage extends Phaser.Scene {
   }
 
   generateBoxThrow(x, y, flip) {
-    const decoySprite = this.physics.add.sprite(x, y, 'piggee-box');
+    const boxSprite = this.physics.add.sprite(x, y, 'piggee-box');
 
     // Character appearance
-    decoySprite.setSize(17, 14);
-    decoySprite.setOffset(2, 0);
-    decoySprite.setScale(1.7);
+    boxSprite.setSize(17, 14);
+    boxSprite.setOffset(2, 0);
+    boxSprite.setScale(1.7);
 
     // Character physics
-    decoySprite.setCollideWorldBounds(true);
-    this.physics.add.collider(decoySprite, this.platforms);
+    boxSprite.setCollideWorldBounds(true);
+    this.physics.add.collider(boxSprite, this.registry.get('platforms'));
 
-    decoySprite.setVelocityX(250 * (flip ? -1 : 1));
-    decoySprite.setVelocityY(-300);
-    decoySprite.setFlipX(decoySprite.body.velocity.x < 0);
-    this.data.get('boxGroup').add(decoySprite);
-  }
-
-  // Add animation to phaser
-  createAnimation(name, frames, repeat) {
-    const config = {
-      key: name,
-      frames: this.anims.generateFrameNumbers(name, { start: 0, end: frames }),
-      frameRate: 10,
-    };
-    if (repeat) {
-      config.repeat = -1;
-    }
-    this.anims.create(config);
+    boxSprite.setVelocityX(250 * (flip ? -1 : 1));
+    boxSprite.setVelocityY(-300);
+    boxSprite.setFlipX(boxSprite.body.velocity.x < 0);
+    this.data.get('boxGroup').add(boxSprite);
   }
 }
