@@ -90,8 +90,19 @@ export default class GameStage extends Phaser.Scene {
 
   readPlayerInput() {
     const playerSprite = this.data.get('playerSprite');
+
+    if (this.registry.get('spacebar').isUp) {
+      if (playerSprite.character === 'piggee-special') {
+        this.registry.get('socket').emit('client_specialMove');
+      }
+    }
+
     if (this.registry.get('spacebar').isDown) {
-      this.registry.get('socket').emit('client_specialMove');
+      if (playerSprite.character === 'piggee' && Date.now() - this.specialMoveTime >= 5000) {
+        this.registry.get('socket').emit('client_changeCharacter');
+      } else if (playerSprite.character !== 'piggee-special') {
+        this.registry.get('socket').emit('client_specialMove');
+      }
     }
 
     if (this.cursors.up.isDown) {
@@ -193,6 +204,13 @@ export default class GameStage extends Phaser.Scene {
       }, duration);
     });
 
+    this.socket.on('server_changeCharacter', ({ socketId, character }) => {
+      const changingPlayerSprite = (this.registry.get('socketId') === socketId)
+        ? this.data.get('playerSprite')
+        : this.data.get('otherPlayers').get(socketId);
+      changingPlayerSprite.character = character;
+    });
+
     this.socket.on('server_specialMoveGranted', ({ socketId }) => {
       let playerSprite;
       if (socketId === this.registry.get('socketId')) {
@@ -203,9 +221,7 @@ export default class GameStage extends Phaser.Scene {
       }
 
       // Set invisible for other players
-      if (playerSprite.character === 'piggee') {
-        playerSprite.character = 'piggee-special';
-      } else if (playerSprite.character === 'piggee-special') {
+      if (playerSprite.character === 'piggee-special') {
         playerSprite.character = 'piggee';
         this.generateBoxThrow(
           playerSprite.x,
@@ -273,7 +289,13 @@ export default class GameStage extends Phaser.Scene {
 
     // Character physics
     boxSprite.setCollideWorldBounds(true);
-    this.physics.add.collider(boxSprite, this.registry.get('platforms'));
+    this.physics.add.collider(boxSprite, this.registry.get('platforms'), (collisionDetail) => {
+      if (collisionDetail.body.newVelocity.x === 0) {
+        if (Math.random() > 0.5) this.sound.play('box-break');
+        else this.sound.play('crate-break');
+        boxSprite.destroy();
+      }
+    });
 
     boxSprite.setVelocityX(250 * (flip ? -1 : 1));
     boxSprite.setVelocityY(-300);

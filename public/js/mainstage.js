@@ -18,7 +18,7 @@ export default class MainStage extends Phaser.Scene {
   }
 
   preload() {
-    this.load.plugin('PhaserSceneWatcherPlugin', 'https://cdn.jsdelivr.net/npm/phaser-plugin-scene-watcher@6.0.0/dist/phaser-plugin-scene-watcher.umd.js', true);
+    // this.load.plugin('PhaserSceneWatcherPlugin', 'https://cdn.jsdelivr.net/npm/phaser-plugin-scene-watcher@6.0.0/dist/phaser-plugin-scene-watcher.umd.js', true);
 
     // Load assets
     // Load  Monkee assets
@@ -50,6 +50,7 @@ export default class MainStage extends Phaser.Scene {
     this.load.audio('punch', 'assets/Sounds/punch.mp3');
     this.load.audio('small-punch', 'assets/Sounds/small-punch.wav');
     this.load.audio('crate-break', 'assets/Sounds/crate-break.wav');
+    this.load.audio('box-break', 'assets/Sounds/box-break.wav');
 
     // Load stage assets
     this.load.image('background', 'assets/maps/images/background.png');
@@ -106,6 +107,7 @@ export default class MainStage extends Phaser.Scene {
     this.sound.add('grunt', { volume: 0.2, detune: 400 });
     this.sound.add('small-punch', { volume: 0.2, detune: 400 });
     this.sound.add('crate-break', { volume: 0.8 });
+    this.sound.add('box-break', { volume: 0.8 });
   }
 
   setupSockets() {

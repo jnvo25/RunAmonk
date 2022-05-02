@@ -78,6 +78,10 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('client_changeCharacter', () => {
+    io.emit('server_changeCharacter', { socketId: socket.id, character: 'piggee-special' });
+  });
+
   socket.on('client_specialMove', () => {
     if (Game.activatePlayerSpecialMove(socket.id)) {
       io.emit('server_specialMoveGranted', { socketId: socket.id });
