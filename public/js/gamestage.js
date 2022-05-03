@@ -138,7 +138,7 @@ export default class GameStage extends Phaser.Scene {
       flip: playerSprite.flipX,
       anim: playerSprite.anims.getName(),
     };
-    if (!Object.is(playerMovementData, this.data.get('prevPlayerMovementData'))) {
+    if (!this.data.get('prevPlayerMovementData') || (playerMovementData.velX !== this.data.get('prevPlayerMovementData').velX || playerMovementData.velY !== this.data.get('prevPlayerMovementData').velY)) {
       this.registry.get('socket').emit('client_movementUpdate', { ...playerMovementData });
       this.data.set('prevPlayerMovementData', playerMovementData);
     }
