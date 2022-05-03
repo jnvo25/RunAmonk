@@ -51,6 +51,7 @@ export default class MainStage extends Phaser.Scene {
     this.load.audio('small-punch', 'assets/Sounds/small-punch.wav');
     this.load.audio('crate-break', 'assets/Sounds/crate-break.wav');
     this.load.audio('box-break', 'assets/Sounds/box-break.wav');
+    this.load.audio('pig-grunt', 'assets/Sounds/pig-grunt.wav');
 
     // Load stage assets
     this.load.image('background', 'assets/maps/images/background.png');
@@ -101,13 +102,15 @@ export default class MainStage extends Phaser.Scene {
     this.createAnimation('piggee-special-run', 5, true);
 
     // Create sounds
-    this.sound.add('jump', { volume: 0.3, detune: 400 });
-    this.sound.add('background', { volume: 0.2, detune: 200 });
-    this.sound.add('punch', { volume: 0.2 });
-    this.sound.add('grunt', { volume: 0.2, detune: 400 });
-    this.sound.add('small-punch', { volume: 0.2, detune: 400 });
-    this.sound.add('crate-break', { volume: 0.8 });
-    this.sound.add('box-break', { volume: 0.8 });
+    // TODO: make into object and set into registry
+    this.registry.set('jump', this.sound.add('jump', { volume: 0.2, detune: 400 }));
+    this.registry.set('background', this.sound.add('background', { volume: 0.1, detune: 200 }));
+    this.registry.set('punch', this.sound.add('punch', { volume: 0.2 }));
+    this.registry.set('grunt', this.sound.add('grunt', { volume: 0.2, detune: 400 }));
+    this.registry.set('small-punch', this.sound.add('small-punch', { volume: 0.2, detune: 400 }));
+    this.registry.set('crate-break', this.sound.add('crate-break', { volume: 0.2 }));
+    this.registry.set('box-break', this.sound.add('box-break', { volume: 0.2 }));
+    this.registry.set('pig-grunt', this.sound.add('pig-grunt', { volume: 0.8 }));
   }
 
   setupSockets() {

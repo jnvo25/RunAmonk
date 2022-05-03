@@ -35,8 +35,8 @@ export default class GameStage extends Phaser.Scene {
     });
 
     this.physics.add.collider(this.registry.get('runnerGroup'), this.data.get('boxGroup'), (runner, box) => {
-      this.sound.play('small-punch');
-      this.sound.play('crate-break');
+      this.registry.get('small-punch').play();
+      this.registry.get('crate-break').play();
       box.destroy();
       if (runner.id === this.registry.get('socketId')) {
         this.registry.get('socket').emit('client_slowed');
@@ -68,6 +68,8 @@ export default class GameStage extends Phaser.Scene {
     this.timer = this.add.text(738, 35, (this.registry.get('gameDuration') - Date.now() - this.registry.get('startTime')), { backgroundColor: '#ffo', fontSize: '40px' }).setOrigin(0.5);
     this.specialMoveTime = 0;
     this.specialTimer = this.add.text(125, 35, '', { backgroundColor: '#ffo', fontSize: '20px' }).setOrigin(0.5);
+
+    this.registry.get('background').play();
   }
 
   update() {
@@ -107,7 +109,7 @@ export default class GameStage extends Phaser.Scene {
 
     if (this.cursors.up.isDown) {
       if (playerSprite.body.onFloor()) {
-        this.sound.play('jump');
+        this.registry.get('jump').play();
         playerSprite.setVelocityY(-400);
       }
     }
@@ -187,8 +189,8 @@ export default class GameStage extends Phaser.Scene {
     });
 
     this.socket.on('server_tagUpdate', (socketId) => {
-      this.sound.play('punch');
-      this.sound.play('grunt');
+      this.registry.get('punch').play();
+      this.registry.get('grunt').play();
       if (socketId === this.registry.get('socketId')) {
         this.data.set('clientTagged', true);
         this.destroyOnAnimationComplete(this.data.get('playerSprite'));
@@ -223,6 +225,7 @@ export default class GameStage extends Phaser.Scene {
       // Set invisible for other players
       if (playerSprite.character === 'piggee-special') {
         playerSprite.character = 'piggee';
+        this.registry.get('pig-grunt').play();
         this.generateBoxThrow(
           playerSprite.x,
           playerSprite.y,
@@ -268,7 +271,7 @@ export default class GameStage extends Phaser.Scene {
     decoySprite.setFlipX(decoySprite.body.velocity.x < 0);
     setTimeout(() => {
       this.destroyOnAnimationComplete(decoySprite);
-      this.sound.play('grunt');
+      this.registry.get('grunt').play();
     }, 3000);
   }
 
@@ -291,8 +294,8 @@ export default class GameStage extends Phaser.Scene {
     boxSprite.setCollideWorldBounds(true);
     this.physics.add.collider(boxSprite, this.registry.get('platforms'), (collisionDetail) => {
       if (collisionDetail.body.newVelocity.x === 0) {
-        if (Math.random() > 0.5) this.sound.play('box-break');
-        else this.sound.play('crate-break');
+        if (Math.random() > 0.5) this.registry.get('box-break').play();
+        else this.registry.get('crate-break').play();
         boxSprite.destroy();
       }
     });
