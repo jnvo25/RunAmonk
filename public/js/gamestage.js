@@ -8,47 +8,32 @@ export default class GameStage extends Phaser.Scene {
     super('GameStage');
   }
 
-  // preload() {
-  //   // this.load.setPath('assets/audio/tech');
-
-  // }
-
   create() {
     // Setup communications with server
     this.socket = this.registry.get('socket');
     if (this.registry.get('firstRun')) this.setupSockets();
-
-    // Get variables ready
-    this.registry.set('chaserGroup', this.add.group());
-    this.registry.set('runnerGroup', this.add.group());
-    this.data.set('boxGroup', this.add.group());
-    this.cursors = this.registry.get('cursors');
     this.data.set('clientTagged', false);
 
-    // Handle overlap tag
-    this.physics.add.overlap(this.registry.get('runnerGroup'), this.registry.get('chaserGroup'), (player1, player2) => {
-      if (!player1.isChaser) {
-        this.registry.get('runnerGroup').remove(player1);
-        if (this.registry.get('socketId') === player1.id) this.registry.get('socket').emit('client_tagged');
-      }
-      if (!player2.isChaser) {
-        this.registry.get('runnerGroup').remove(player2);
-        if (this.registry.get('socketId') === player2.id) this.registry.get('socket').emit('client_tagged');
-      }
-    });
+    // Get variables ready
+    this.data.set('allPlayerSprites', this.add.group());
+    this.data.set('boxGroup', this.add.group());
 
-    this.physics.add.collider(this.registry.get('runnerGroup'), this.data.get('boxGroup'), (runner, box) => {
+    // Add collision detections between groups
+    this.physics.add.collider(this.data.get('allPlayerSprites'), this.data.get('boxGroup'), (player, box) => {
       this.registry.get('small-punch').play();
       this.registry.get('crate-break').play();
       box.destroy();
-      if (runner.id === this.registry.get('socketId')) {
+      if (player.id === this.registry.get('socketId')) {
         this.registry.get('socket').emit('client_slowed');
       }
     });
 
     // Create player
     const playerData = this.registry.get('playerData');
-    this.data.set('playerSprite', this.createPlayer(this.registry.get('socketId'), playerData.position.x, playerData.position.y, playerData.character, playerData.isChaser, playerData.speed));
+    this.data.set('clientSprite', this.createPlayer(this.registry.get('socketId'), playerData.position.x, playerData.position.y, playerData.character, playerData.isChaser, playerData.speed));
+    this.physics.add.overlap(this.data.get('clientSprite'), this.data.get('allPlayerSprites'), (clientPlayer, otherPlayer) => {
+      if (otherPlayer.isChaser) this.registry.get('socket').emit('client_tagged');
+    });
 
     // Create other players
     const iterator = this.registry.get('gameRoomOccupants').entries();
@@ -59,9 +44,11 @@ export default class GameStage extends Phaser.Scene {
         position, character, isChaser, speed,
       } = iteratorData.value[1];
       const { x, y } = position;
+      const tempSprite = this.createPlayer(iteratorData.value[0], x, y, character, isChaser, speed);
+      this.data.get('allPlayerSprites').add(tempSprite);
       otherPlayers.set(
         iteratorData.value[0],
-        this.createPlayer(iteratorData.value[0], x, y, character, isChaser, speed),
+        tempSprite,
       );
       iteratorData = iterator.next();
     }
@@ -94,7 +81,7 @@ export default class GameStage extends Phaser.Scene {
   }
 
   readPlayerInput() {
-    const playerSprite = this.data.get('playerSprite');
+    const playerSprite = this.data.get('clientSprite');
 
     if (this.registry.get('spacebar').isUp) {
       if (playerSprite.character === 'piggee-special') {
@@ -110,17 +97,17 @@ export default class GameStage extends Phaser.Scene {
       }
     }
 
-    if (this.cursors.up.isDown) {
+    if (this.registry.get('cursors').up.isDown) {
       if (playerSprite.body.onFloor()) {
         this.registry.get('jump').play();
         playerSprite.setVelocityY(-400);
       }
     }
-    if (this.cursors.left.isDown) {
+    if (this.registry.get('cursors').left.isDown) {
       playerSprite.setVelocityX(-playerSprite.speed);
       playerSprite.setFlipX(true);
       playerSprite.anims.play(`${playerSprite.character}-run`, true);
-    } else if (this.cursors.right.isDown) {
+    } else if (this.registry.get('cursors').right.isDown) {
       playerSprite.setVelocityX(playerSprite.speed);
       playerSprite.setFlipX(false);
       playerSprite.anims.play(`${playerSprite.character}-run`, true);
@@ -156,7 +143,6 @@ export default class GameStage extends Phaser.Scene {
     tempPlayerSprite.character = character;
     tempPlayerSprite.isChaser = isChaser;
     tempPlayerSprite.speed = speed;
-    this.registry.get((isChaser) ? 'chaserGroup' : 'runnerGroup').add(tempPlayerSprite);
 
     // Character appearance
     if (tempPlayerSprite.character === 'piggee') {
@@ -171,6 +157,7 @@ export default class GameStage extends Phaser.Scene {
     // Character physics
     tempPlayerSprite.setCollideWorldBounds(true);
     this.physics.add.collider(tempPlayerSprite, this.registry.get('platforms'));
+    this.data.get('allPlayerSprites').add(tempPlayerSprite);
 
     return tempPlayerSprite;
   }
@@ -196,22 +183,22 @@ export default class GameStage extends Phaser.Scene {
       this.registry.get('grunt').play();
       if (socketId === this.registry.get('socketId')) {
         this.data.set('clientTagged', true);
-        this.destroyOnAnimationComplete(this.data.get('playerSprite'));
+        this.destroyOnAnimationComplete(this.data.get('clientSprite'));
       } else {
         this.destroyOnAnimationComplete(this.data.get('otherPlayers').get(socketId));
       }
     });
 
     this.socket.on('server_speedUpdate', ({ speed, duration }) => {
-      this.data.get('playerSprite').speed = speed;
+      this.data.get('clientSprite').speed = speed;
       setTimeout(() => {
-        this.data.get('playerSprite').speed = this.registry.get('playerData').speed;
+        this.data.get('clientSprite').speed = this.registry.get('playerData').speed;
       }, duration);
     });
 
     this.socket.on('server_changeCharacter', ({ socketId, character }) => {
       const changingPlayerSprite = (this.registry.get('socketId') === socketId)
-        ? this.data.get('playerSprite')
+        ? this.data.get('clientSprite')
         : this.data.get('otherPlayers').get(socketId);
       changingPlayerSprite.character = character;
     });
@@ -220,7 +207,7 @@ export default class GameStage extends Phaser.Scene {
       let playerSprite;
       if (socketId === this.registry.get('socketId')) {
         this.specialMoveTime = Date.now();
-        playerSprite = this.data.get('playerSprite');
+        playerSprite = this.data.get('clientSprite');
       } else {
         playerSprite = this.data.get('otherPlayers').get(socketId);
       }
