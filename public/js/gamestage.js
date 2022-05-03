@@ -109,7 +109,7 @@ export default class GameStage extends Phaser.Scene {
       if (playerSprite.character === 'piggee' && Date.now() - this.specialMoveTime >= 5000) {
         this.registry.get('socket').emit('client_changeCharacter');
       } else if (playerSprite.character !== 'piggee-special') {
-        this.registry.get('socket').emit('client_specialMove');
+        this.registry.get('socket').emit('client_specialMove', { x: playerSprite.x, y: playerSprite.y });
       }
     }
 
