@@ -93,8 +93,8 @@ io.on('connection', (socket) => {
   });
 
   socket.on('client_tagged', () => {
-    Game.updatePlayerTagged(socket.id);
-    io.emit('server_tagUpdate', socket.id);
+    if (Game.updatePlayerTagged(socket.id)) io.emit('server_tagUpdate', socket.id);
+    Game.checkAllPlayersTagged();
   });
 
   socket.on('client_slowed', () => {

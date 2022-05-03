@@ -138,8 +138,13 @@ module.exports = class Game {
 
   updatePlayerTagged(socketId) {
     Game.verifyValidSocketId(socketId);
-    this.getPlayer(socketId, GAME_ROOMS.GAME).isTagged = true;
+    const taggedPlayer = this.getPlayer(socketId, GAME_ROOMS.GAME);
+    if (taggedPlayer.isTagged) return false;
+    taggedPlayer.isTagged = true;
+    return true;
+  }
 
+  checkAllPlayersTagged() {
     // Check gameover if all players have been tagged
     const iterator = this.players.get(GAME_ROOMS.GAME).values();
     let iteratorResult = iterator.next();
