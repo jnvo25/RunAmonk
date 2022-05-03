@@ -27,8 +27,14 @@ export default class GameStage extends Phaser.Scene {
 
     // Handle overlap tag
     this.physics.add.overlap(this.registry.get('runnerGroup'), this.registry.get('chaserGroup'), (player1, player2) => {
-      if (!player1.isChaser) this.registry.get('runnerGroup').remove(player1);
-      if (!player2.isChaser) this.registry.get('runnerGroup').remove(player2);
+      if (!player1.isChaser) {
+        this.registry.get('runnerGroup').remove(player1);
+        player1.setAlpha(1);
+      }
+      if (!player2.isChaser) {
+        this.registry.get('runnerGroup').remove(player2);
+        player2.setAlpha(1);
+      }
       if (!this.data.get('playerSprite').isChaser) {
         this.registry.get('socket').emit('client_tagged');
       }
