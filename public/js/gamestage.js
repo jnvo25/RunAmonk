@@ -101,7 +101,7 @@ export default class GameStage extends Phaser.Scene {
 
     if (this.registry.get('spacebar').isUp) {
       if (playerSprite.character === 'piggee-special') {
-        this.registry.get('socket').emit('client_specialMove');
+        this.registry.get('socket').emit('client_specialMove', { x: playerSprite.x, y: playerSprite.y });
       }
     }
 
@@ -219,7 +219,7 @@ export default class GameStage extends Phaser.Scene {
       changingPlayerSprite.character = character;
     });
 
-    this.socket.on('server_specialMoveGranted', ({ socketId }) => {
+    this.socket.on('server_specialMoveGranted', ({ position, socketId }) => {
       let playerSprite;
       if (socketId === this.registry.get('socketId')) {
         this.specialMoveTime = Date.now();
@@ -233,8 +233,8 @@ export default class GameStage extends Phaser.Scene {
         playerSprite.character = 'piggee';
         this.registry.get('pig-grunt').play();
         this.generateBoxThrow(
-          playerSprite.x,
-          playerSprite.y,
+          position.x,
+          position.y,
           playerSprite.flipX,
         );
       } else {
@@ -248,8 +248,8 @@ export default class GameStage extends Phaser.Scene {
           playerSprite.setAlpha(1);
         }, 1000);
         this.generateDecoy(
-          playerSprite.x,
-          playerSprite.y,
+          position.x,
+          position.y,
           playerSprite.flipX,
           playerSprite.character,
           playerSprite.speed,
