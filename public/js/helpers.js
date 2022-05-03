@@ -3,7 +3,7 @@ function getTime(startTime, gameDuration) {
 }
 
 function getRandomInt(cap) {
-  Math.floor(Math.random() * cap);
+  return Math.floor(Math.random() * cap);
 }
 
 module.exports = {
