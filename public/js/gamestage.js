@@ -16,14 +16,14 @@ export default class GameStage extends Phaser.Scene {
 
     // Get variables ready
     this.data.set('allPlayerSprites', this.add.group());
-    this.data.set('boxGroup', this.add.group());
+    this.data.set('projectileSprites', this.add.group());
 
     // Add collision detections between groups
-    this.physics.add.collider(this.data.get('allPlayerSprites'), this.data.get('boxGroup'), (player, box) => {
+    this.physics.add.collider(this.data.get('allPlayerSprites'), this.data.get('projectileSprites'), (playerSprite, projectileSprite) => {
       this.registry.get('small-punch').play();
-      this.registry.get('crate-break').play();
-      box.destroy();
-      if (player.id === this.registry.get('socketId')) {
+      if (projectileSprite.type === 'box') this.registry.get('crate-break').play();
+      projectileSprite.destroy();
+      if (playerSprite.id === this.registry.get('socketId')) {
         this.registry.get('socket').emit('client_slowed');
       }
     });
@@ -275,6 +275,7 @@ export default class GameStage extends Phaser.Scene {
 
   generateBoxThrow(x, y, flip) {
     const boxSprite = this.physics.add.sprite(x, y, 'piggee-box');
+    boxSprite.type = 'box';
 
     // Character appearance
     boxSprite.setSize(17, 14);
@@ -294,6 +295,6 @@ export default class GameStage extends Phaser.Scene {
     boxSprite.setVelocityX(250 * (flip ? -1 : 1));
     boxSprite.setVelocityY(-300);
     boxSprite.setFlipX(boxSprite.body.velocity.x < 0);
-    this.data.get('boxGroup').add(boxSprite);
+    this.data.get('projectileSprites').add(boxSprite);
   }
 }
