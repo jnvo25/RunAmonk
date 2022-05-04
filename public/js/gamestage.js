@@ -28,30 +28,31 @@ export default class GameStage extends Phaser.Scene {
       }
     });
 
-    // Create player
-    const playerData = this.registry.get('playerData');
-    this.data.set('clientSprite', this.createPlayer(this.registry.get('socketId'), playerData.position.x, playerData.position.y, playerData.character, playerData.isChaser, playerData.speed));
-    this.physics.add.overlap(this.data.get('clientSprite'), this.data.get('allPlayerSprites'), (clientPlayer, otherPlayer) => {
-      if (otherPlayer.isChaser) this.registry.get('socket').emit('client_tagged');
-    });
-
-    // Create other players
-    const iterator = this.registry.get('gameRoomOccupants').entries();
+    // Create sprite for each player and place in a set (for checking) and map (changing)
+    const playerStartData = this.registry.get('playerStartData');
     const otherPlayers = new Map();
-    let iteratorData = iterator.next();
-    while (!iteratorData.done) {
+    playerStartData.forEach((element) => {
       const {
         position, character, isChaser, speed,
-      } = iteratorData.value[1];
+      } = element[1];
       const { x, y } = position;
-      const tempSprite = this.createPlayer(iteratorData.value[0], x, y, character, isChaser, speed);
+      const tempSprite = this.createPlayer(element[0], x, y, character, isChaser, speed);
       this.data.get('allPlayerSprites').add(tempSprite);
-      otherPlayers.set(
-        iteratorData.value[0],
-        tempSprite,
-      );
-      iteratorData = iterator.next();
-    }
+      if (this.registry.get('socketId') === element[0]) {
+        // Sprite created is for client
+        // Detect collisions with client's sprite
+        this.physics.add.overlap(tempSprite, this.data.get('allPlayerSprites'), (clientPlayer, otherPlayer) => {
+          if (otherPlayer.isChaser) this.registry.get('socket').emit('client_tagged');
+        });
+
+        // Make data easily accessible
+        this.data.set('playerData', element[1]);
+        this.data.set('clientSprite', tempSprite);
+      } else {
+        // Sprite created is for a different client
+        otherPlayers.set(element[0], tempSprite);
+      }
+    });
     this.data.set('otherPlayers', otherPlayers);
 
     // Create timer
@@ -82,7 +83,6 @@ export default class GameStage extends Phaser.Scene {
 
   readPlayerInput() {
     const playerSprite = this.data.get('clientSprite');
-
     if (this.registry.get('spacebar').isUp) {
       if (playerSprite.character === 'piggee-special') {
         this.registry.get('socket').emit('client_specialMove', { x: playerSprite.x, y: playerSprite.y });
