@@ -194,8 +194,7 @@ module.exports = class Game {
       iteratorResult = iterator.next();
     }
 
-    // TODO: Make sure there are more than 1 ready player
-    return true;
+    return this.players.get(GAME_ROOMS.PREGAME).size >= 2;
   }
 
   get waitingPlayers() {
