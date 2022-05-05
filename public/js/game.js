@@ -126,16 +126,6 @@ module.exports = class Game {
     this.players.get(playerState).delete(socketId);
   }
 
-  activatePlayerSpecialMove(socketId) {
-    Game.verifyValidSocketId(socketId);
-    const playerSpecialMoveCooldown = this.getPlayer(socketId, GAME_ROOMS.GAME).specialMoveCooldown;
-    if (Date.now() - playerSpecialMoveCooldown >= 5000 || playerSpecialMoveCooldown === undefined) {
-      this.getPlayer(socketId, GAME_ROOMS.GAME).specialMoveCooldown = Date.now();
-      return true;
-    }
-    return false;
-  }
-
   updatePlayerTagged(socketId) {
     Game.verifyValidSocketId(socketId);
     const taggedPlayer = this.getPlayer(socketId, GAME_ROOMS.GAME);

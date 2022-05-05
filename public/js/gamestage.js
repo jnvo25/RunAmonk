@@ -89,11 +89,11 @@ export default class GameStage extends Phaser.Scene {
       }
     }
 
-    if (this.registry.get('spacebar').isDown) {
-      if (playerSprite.character === 'piggee' && Date.now() - this.specialMoveTime >= 5000) {
-        this.registry.get('socket').emit('client_changeCharacter');
-      } else if (playerSprite.character !== 'piggee-special') {
+    if (this.registry.get('spacebar').isDown && Date.now() - this.specialMoveTime >= 5000) {
+      if (playerSprite.character === 'piggee') this.registry.get('socket').emit('client_changeCharacter');
+      else if (playerSprite.character !== 'piggee-special') {
         this.registry.get('socket').emit('client_specialMove', { x: playerSprite.x, y: playerSprite.y });
+        this.specialMoveTime = Date.now();
       }
     }
 
@@ -192,7 +192,7 @@ export default class GameStage extends Phaser.Scene {
     this.socket.on('server_speedUpdate', ({ speed, duration }) => {
       this.data.get('clientSprite').speed = speed;
       setTimeout(() => {
-        this.data.get('clientSprite').speed = this.registry.get('playerData').speed;
+        this.data.get('clientSprite').speed = this.data.get('playerData').speed;
       }, duration);
     });
 

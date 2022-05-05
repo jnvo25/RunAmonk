@@ -83,7 +83,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('client_specialMove', (position) => {
-    if (Game.gameStatus === GAME_STATUS.PLAYING && Game.activatePlayerSpecialMove(socket.id)) {
+    if (Game.gameStatus === GAME_STATUS.PLAYING) {
       io.emit('server_specialMoveGranted', { position, socketId: socket.id });
     }
   });
