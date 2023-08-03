@@ -221,7 +221,7 @@ export default class GameStage extends Phaser.Scene {
           position.y,
           playerSprite.flipX,
         );
-      } else {
+      } else if (playerSprite.character !== 'piggee') {
         if (socketId !== this.registry.get('socketId')) {
           playerSprite.setAlpha(0);
         } else {
